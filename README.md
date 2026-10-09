@@ -6,11 +6,11 @@ Ask for validation to receive the password.
 
 
 HOW TO INSTALL
-Close game
-Unzip with Winrar or 7Zip
-Run install BAT
-Press anykey when prompted
-Play
+1. Close game
+2. Unzip with Winrar or 7Zip
+3. Run install BAT
+4. Press anykey when prompted
+5. Play
 
 Windows 11 Users Follow the Below
 1. Press the Windows Key and open Settings (or press Windows Key + I).
