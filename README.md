@@ -2,6 +2,7 @@
 
 This patch stops the game from crashing when it runs out of memory.
 It works with all mods.
+In a multiplayer lobby it also tells you in the chat who is not on the same patch version.
 
 ## How to install
 
@@ -48,9 +49,11 @@ Your game is back to how it was.
 ## What the launcher sends
 
 - A count of how many people use the patch. No names.
-- A small report when the game crashes or a match goes out of sync.
+- A small report when the game crashes or a match goes out of sync. For out-of-sync, the replay of that match is included.
 
 You can turn both off. Untick the two boxes at the bottom of the launcher.
+
+In a multiplayer lobby, the patch tells the other players' games which patch version you run. Nothing else is shared.
 
 ---
 
