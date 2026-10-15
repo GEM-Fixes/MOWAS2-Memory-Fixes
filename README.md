@@ -49,11 +49,9 @@ Your game is back to how it was.
 ## What the launcher sends
 
 - A count of how many people use the patch. No names.
-- A small report when the game crashes or a match goes out of sync. For out-of-sync, the replay of that match is included.
+- A small report when the game crashes or a match goes out of sync.
 
 You can turn both off. Untick the two boxes at the bottom of the launcher.
-
-In a multiplayer lobby, the patch tells the other players' games which patch version you run. Nothing else is shared.
 
 ---
 
