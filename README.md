@@ -10,6 +10,10 @@ The game is a 32-bit program and can only use 4 GB of memory at a time. The patc
 
 Simply put: this is the most efficient and best way to play Men of War: Assault Squad 2, bar none.
 
+This started as a patch among friends to play [RobZ](https://steamcommunity.com/sharedfiles/filedetails/?id=610304528) without crashing but has since grown into something hundreds of people have used to play.
+
+It has expanded far beyond its original goal and all of this has only been possible with the help and contributions of the community with contributions from many different people.
+
 ## How to install
 
 1. Close the game.
