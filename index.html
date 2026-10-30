@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How the Patch Works</title>
+<meta name="description" content="What the MoWAS2 Memory Optimizer Patch does, explained simply, with measurements.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f3ef;
+  --surface-1: #fcfcfb;
+  --surface-2: #ecebe6;
+  --line: #d9d8d2;
+  --grid: #e6e5df;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #7a7974;
+  --accent: #2a78d6;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4;
+  --free: #dcdbd5;
+  --hero-ink: #f0efec;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --bg: #121211; --surface-1: #1a1a19; --surface-2: #232321; --line: #34332f; --grid: #2a2a27;
+    --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #8f8e86; --accent: #3987e5;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --free: #2e2e2b;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121211; --surface-1: #1a1a19; --surface-2: #232321; --line: #34332f; --grid: #2a2a27;
+  --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #8f8e86; --accent: #3987e5;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --free: #2e2e2b;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text-primary); font: 16px/1.6 Inter, system-ui, sans-serif; }
+.mono, code, .k { font-family: "JetBrains Mono", ui-monospace, monospace; }
+a { color: var(--accent); }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+/* hero */
+.hero { position: relative; overflow: hidden; background: #0c0c0b; color: var(--hero-ink); }
+.hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .38; filter: saturate(.55) contrast(1.05); }
+.hero .scan { position: absolute; inset: 0; background:
+  linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px) 0 0 / 100% 32px,
+  linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px) 0 0 / 32px 100%,
+  linear-gradient(180deg, rgba(12,12,11,.2), rgba(12,12,11,.92)); }
+.hero .wrap { position: relative; padding-top: 72px; padding-bottom: 40px; }
+.tag { display: inline-block; font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .08em; text-transform: uppercase;
+  padding: 6px 8px; border: 1px solid rgba(255,255,255,.25); border-radius: 4px; color: #c3c2b7; }
+.hero h1 { font-size: clamp(32px, 6vw, 56px); line-height: 1.05; margin: 18px 0 12px; letter-spacing: -.02em; }
+.hero p.lede { max-width: 640px; color: #d6d5cd; font-size: 18px; margin: 0 0 28px; }
+.hud { position: absolute; font: 11px/1.3 "JetBrains Mono", monospace; color: rgba(240,239,236,.7); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2px; margin-top: 8px;
+  border: 1px solid rgba(255,255,255,.14); border-radius: 8px; overflow: hidden; }
+.stat { background: rgba(20,20,19,.72); padding: 14px 16px; }
+.stat .v { font: 600 22px/1.1 "JetBrains Mono", monospace; white-space: nowrap; }
+.stat .l { font-size: 13px; color: #c3c2b7; margin-top: 4px; }
+
+/* sections */
+section { padding: 56px 0 8px; }
+.eyebrow { font: 600 12px/1 "JetBrains Mono", monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+h2 { font-size: clamp(24px, 4vw, 34px); line-height: 1.15; margin: 10px 0 14px; letter-spacing: -.01em; }
+h3 { font-size: 18px; margin: 0 0 4px; }
+p { color: var(--text-secondary); max-width: 720px; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 820px) { .cols { grid-template-columns: 1fr; } }
+.card { background: var(--surface-1); border: 1px solid var(--line); border-radius: 10px; padding: 18px; margin: 18px 0; }
+.card .sub { color: var(--text-secondary); font-size: 14px; margin: 0 0 10px; }
+.note { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+details { margin-top: 10px; font-size: 13px; }
+summary { cursor: pointer; color: var(--text-secondary); }
+table { border-collapse: collapse; width: 100%; margin-top: 8px; font: 12px/1.4 "JetBrains Mono", monospace; }
+th, td { text-align: right; padding: 4px 8px; border-bottom: 1px solid var(--grid); }
+th:first-child, td:first-child { text-align: left; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--text-secondary); margin: 4px 0 10px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text { font-family: Inter, system-ui, sans-serif; }
+.ax { fill: var(--text-muted); font-size: 11px; }
+.lbl { fill: var(--text-primary); font-size: 12px; font-weight: 600; }
+.lbl2 { fill: var(--text-secondary); font-size: 11px; }
+.tip { position: fixed; pointer-events: none; z-index: 10; background: var(--surface-2); color: var(--text-primary);
+  border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; font: 12px/1.35 "JetBrains Mono", monospace;
+  box-shadow: 0 4px 14px rgba(0,0,0,.18); opacity: 0; transition: opacity .08s; max-width: 260px; }
+.waffle { display: grid; grid-template-columns: repeat(32, 1fr); gap: 2px; }
+.waffle span { aspect-ratio: 1; border-radius: 2px; }
+.flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; align-items: stretch; }
+@media (max-width: 720px) { .flow { grid-template-columns: 1fr; } }
+.flow div { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font-size: 13px; color: var(--text-secondary); position: relative; }
+.flow b { display: block; color: var(--text-primary); font: 600 12px/1.3 "JetBrains Mono", monospace; margin-bottom: 4px; }
+.overlay { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+.overlay img { display: block; width: 100%; height: auto; filter: saturate(.6) brightness(.8); }
+.overlay svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.badge { position: absolute; top: 10px; left: 10px; font: 600 11px/1 "JetBrains Mono", monospace; letter-spacing: .06em;
+  background: rgba(12,12,11,.75); color: #f0efec; padding: 6px 8px; border-radius: 4px; }
+.sim3d { border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
+.flowcv, .gridcv { display: block; width: 100%; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); }
+.gridcv { max-width: 340px; }
+.lbl3 { font: 600 13px/1.3 Inter, system-ui, sans-serif; color: var(--text-primary); margin-bottom: 6px; }
+.vstat { font-size: 12px; color: var(--text-secondary); margin-top: 6px; min-height: 2.6em; }
+.vstat b { color: var(--text-primary); }
+.vstat .bad { color: var(--s2); font-weight: 600; }
+.ticks { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); padding: 0 2px; }
+.seg { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 2px 0 10px; }
+.seg button { font: 500 13px Inter, system-ui, sans-serif; padding: 6px 12px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface-2); color: var(--text-secondary); }
+.seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.seg span { font-size: 11px; color: var(--text-muted); }
+footer { padding: 56px 0 72px; color: var(--text-muted); font-size: 14px; }
+.topbar { position: fixed; right: 16px; top: 16px; z-index: 20; display: flex; gap: 6px; }
+.toggle, .topbar select { font: 12px "JetBrains Mono", monospace; background: var(--surface-1);
+  color: var(--text-primary); border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; cursor: pointer; }
+.verbox { border-color: var(--accent); margin-top: 24px; }
+.verbox a { font-weight: 600; }
+@media (max-width: 600px) { .hud { display: none; } }
+</style>
+<script src="i18n.js"></script>
+</head>
+<body>
+<div class="topbar">
+  <select id="langSel" aria-label="Language">
+    <option value="en">English</option><option value="ru">Русский</option><option value="es">Español</option><option value="de">Deutsch</option><option value="zh">中文</option>
+  </select>
+  <button class="toggle" id="themeToggle" type="button" aria-label="Switch light / dark theme">theme</button>
+</div>
+<div class="tip" id="tip" role="status" aria-live="polite"></div>
+
+<header class="hero">
+  <img src="img/base-defense.jpg" alt="">
+  <div class="scan"></div>
+  <div class="hud" style="left:16px;top:16px" data-i18n="hud">mowas_2.exe · 32-bit · 4,096 MB address space</div>
+  <div class="wrap">
+    <span class="tag" data-i18n="tag">How it works · version 1.0.7</span>
+    <h1 data-i18n="h1">How the Memory Optimizer Patch works</h1>
+    <p class="lede" data-i18n="lede">This page explains what the patch for <em>Men of War: Assault Squad 2</em> does, with measurements.
+      Part 1 is about memory. Part 2 is about <strong>Style v1</strong>, the faster battle simulation.</p>
+    <p class="lede mono" style="font-size:14px;margin-top:-14px" data-i18n="gamever">For the Steam version of the game: v3.262, build of 11 October 2019 (32-bit).</p>
+    <div class="stats">
+      <div class="stat"><div class="v">680 MB</div><div class="l" data-i18n="stat1">used at the RobZ main menu (1,354 MB in the lobby before these changes)</div></div>
+      <div class="stat"><div class="v">351</div><div class="l" data-i18n="stat2">vehicle types loaded in one match (base game: out of memory from 200)</div></div>
+      <div class="stat"><div class="v">9.9×</div><div class="l" data-i18n="stat3">less simulation work with 1,000 soldiers (Style v1)</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<div class="card verbox" data-i18n="ver">This page is about <b>version 1.0.7</b> of the patch, which is a pre-release for now.
+  <a href="https://github.com/GEM-Fixes/MOWAS2-Memory-Fixes/releases/tag/nightly">Download the 1.0.7 pre-release</a>
+  (or pick "Pre-release" in the launcher). Most numbers come from test runs of 1.0.7 test versions and earlier versions.</div>
+
+<section id="ceiling">
+  <div class="eyebrow" data-i18n="part1">Part 1 · Memory</div>
+  <h2 data-i18n="ceil_h">The 4 GB limit</h2>
+  <p data-i18n="ceil_p1">The game is a 32-bit program. A 32-bit program can only use 4 GB of memory, even if your PC has much more.</p>
+  <p data-i18n="ceil_p2">Everything the game needs must fit in those 4 GB: the game itself, textures, models, sounds and the graphics
+    driver. Big mods like RobZ use most of it.</p>
+  <p data-i18n="ceil_p3">When the game asks for more memory and there is no free space left, it crashes with
+    <code>Failed to allocate memory (eMemory.cpp, 94)</code>.</p>
+  <div class="card">
+    <h3 data-i18n="waf_h">What is inside the 4 GB during a RobZ multiplayer match (with the patch)</h3>
+    <p class="sub" data-i18n="waf_sub">Each square is 16 MB. There are 256 squares = 4,096 MB.</p>
+    <div class="legend" id="wafLegend"></div>
+    <div class="waffle" id="waffle" role="img" data-i18n-aria="waf_aria" aria-label="Memory map: 256 squares of 16 MB"></div>
+    <p class="note" data-i18n="waf_note">The graphics driver part is this big only on our test computer (a virtual machine). On a normal
+      graphics card most of it is in the card's own memory. The reserve is space the patch keeps free for emergencies.</p>
+    <details><summary data-i18n="show">Show the numbers</summary><table id="wafTable"></table></details>
+  </div>
+</section>
+
+<section id="vaults">
+  <div class="eyebrow" data-i18n="part1">Part 1 · Memory</div>
+  <h2 data-i18n="vault_h">Moving unused data out of the 4 GB</h2>
+  <p data-i18n="vault_p1">Your PC has more memory than the game can use. Windows lets a program store data in that extra memory, but the
+    program cannot read it directly from there.</p>
+  <p data-i18n="vault_p2">When some game data has not been used for a while, the patch copies it into the extra
+    memory and frees the space it took inside the 4 GB. When the game needs that data again, the patch copies it back
+    first.</p>
+  <div class="card">
+    <h3 data-i18n="vt_h">Data kept outside the 4 GB: RobZ and Valour</h3>
+    <p class="sub" data-i18n="vt_sub">MB. RobZ: Battle of the Bulge after two restarts. Valour: replay of a real 4v4 match, about 11 minutes in.</p>
+    <div id="chVaultTotal"></div>
+    <p class="sub" style="margin-top:14px" data-i18n="vt_kind">By kind of data. Geometry = copies of models, surface = copies of textures.</p>
+    <div class="legend" id="lgVaults"></div>
+    <div id="chVaults"></div>
+    <p class="note" data-i18n="vt_note">In the Valour match, 3,390 MB were used inside the 4 GB at the same time. With the 646 MB outside, the
+      game had about 4,000 MB of data, more than fits in 4 GB.</p>
+    <details><summary data-i18n="show">Show the numbers</summary><table id="tbVaults"></table></details>
+  </div>
+  <div class="card">
+    <h3 data-i18n="flow_h">How it works, step by step</h3>
+    <p class="sub" data-i18n="flow_sub">One square = 16 MB. Squares that are being used light up. A square that has not been used for a while
+      fades, then moves out of the 4 GB and leaves free room behind. When the game needs it again it comes back.</p>
+    <div class="legend" id="lgFlow"></div>
+    <canvas id="vaultFlow" class="flowcv" role="img" data-i18n-aria="flow_aria" aria-label="Animation: unused memory blocks moving out of the 4 GB and back"></canvas>
+    <div class="legend" style="margin-top:8px">
+      <span><span data-i18n="vf_in">Used inside the 4 GB:</span> <b class="mono" id="vfIn">-</b></span>
+      <span><span data-i18n="vf_free">Free inside:</span> <b class="mono" id="vfFree">-</b></span>
+      <span><span data-i18n="vf_out">Kept outside:</span> <b class="mono" id="vfOut">-</b></span>
+    </div>
+  </div>
+  <div class="card">
+    <h3 data-i18n="mod_h">A mod with more and more vehicle types</h3>
+    <p class="sub" data-i18n="mod_sub">A test mod that puts different RobZ vehicle types on one map, all loaded and in the match at the same
+      time. Move the slider to add vehicle types. A mod can have more types to buy: only the ones in the match need
+      memory.</p>
+    <input id="vtN" type="range" min="0" max="5" step="1" value="5" data-i18n-aria="mod_aria" aria-label="Number of vehicle types" style="width:100%;margin:4px 0 2px">
+    <div class="ticks mono" id="vtTicks"></div>
+    <div class="cols" style="gap:18px;margin-top:10px">
+      <div><div class="lbl3" data-i18n="without">Without the patch</div><canvas id="vtOff" class="gridcv" role="img" data-i18n-aria="without" aria-label="Without the patch"></canvas><div class="vstat mono" id="vtOffTxt"></div></div>
+      <div><div class="lbl3" data-i18n="with">With the patch</div><canvas id="vtOn" class="gridcv" role="img" data-i18n-aria="with" aria-label="With the patch"></canvas><div class="vstat mono" id="vtOnTxt"></div></div>
+    </div>
+    <p class="note" data-i18n="mod_note">Highest memory use in each test run, on our test computer. With 351 types (every type that loads)
+      the patch kept 786 MB outside the 4 GB. Without the patch the game runs out of memory from 200 types on.</p>
+    <details><summary data-i18n="show">Show the numbers</summary><table id="tbVt"></table></details>
+  </div>
+</section>
+
+<section id="leaks">
+  <div class="eyebrow" data-i18n="part1">Part 1 · Memory</div>
+  <h2 data-i18n="leak_h">Freeing memory left over after a restart</h2>
+  <p data-i18n="leak_p1">When you restart a mission, the game does not free all the memory of the last round. Some of it is never used
+    again. After a few restarts there is less free memory, and the game crashes sooner.</p>
+  <p data-i18n="leak_p2">The patch finds that leftover data and frees it when the next map loads. It also stores small pieces of data
+    tightly, so there are fewer unusable gaps between them.</p>
+  <div class="card">
+    <h3 data-i18n="leak_h3">Memory used after each restart</h3>
+    <p class="sub" data-i18n="leak_sub">RobZ, Battle of the Bulge, 2-minute battles. Same test for both lines. MB.</p>
+    <div class="legend" id="lgLeaks"></div>
+    <div id="chLeaks"></div>
+    <details><summary data-i18n="show">Show the numbers</summary><table id="tbLeaks"></table></details>
+  </div>
+</section>
+
+<section id="style">
+  <div class="eyebrow" data-i18n="part2">Part 2 · Style v1</div>
+  <h2 data-i18n="style_h">Style v1 (battle simulation)</h2>
+  <p data-i18n="style_p1">In every step of a battle, each soldier checks which enemies he can see, where he can take cover and whether
+    he can hit his target. With more soldiers, each soldier has more to check. So the work grows much faster than
+    the number of soldiers, and big battles get slow.</p>
+  <p data-i18n="style_p2">Style v1 is a new way to make these decisions. Soldiers on the same team and in the same small area share the
+    work: what one area can see is worked out once, and every soldier there uses it. The game's own animations,
+    weapons, bullets and damage are not changed.</p>
+  <p data-i18n="style_p3">Style v1 is still in development. In multiplayer it is only used when every player in the match has
+    version 1.0.7; otherwise the game plays as normal.</p>
+
+  <div class="card">
+    <h3 data-i18n="b3d_h">3D view: sight checks, old way and Style v1</h3>
+    <p class="sub" data-i18n="b3d_sub">Two teams of squads on a field split into areas. Each line is one sight check. Old way: every
+      soldier checks every enemy in range. Style v1: every area with soldiers in it checks every enemy in range once,
+      for all of them. Move the slider to change the number of soldiers. Drag to turn.</p>
+    <div class="seg" role="group">
+      <button type="button" id="modeOld" aria-pressed="true" data-i18n="old_way">Old way</button>
+      <button type="button" id="modeNew" aria-pressed="false">Style v1</button>
+      <span class="mono" id="modeAuto" data-i18n="auto">switches every 4 s until you pick one</span>
+    </div>
+    <div class="legend">
+      <span><span data-i18n="soldiers">Soldiers:</span> <b class="mono" id="sim3dNLbl">200</b></span>
+      <span><span data-i18n="chk_old">Checks, old way:</span> <b class="mono" id="sim3dOld">0</b></span>
+      <span><span data-i18n="chk_new">Checks, Style v1:</span> <b class="mono" id="sim3dNew">0</b></span>
+      <span><span data-i18n="chk_ratio">Fewer checks:</span> <b class="mono" id="sim3dRatio">-</b></span>
+    </div>
+    <input id="sim3dN" type="range" min="20" max="1000" step="20" value="200" data-i18n-aria="soldiers" aria-label="Soldiers" style="width:100%;margin:4px 0 10px">
+    <div id="sim3dBattle" class="sim3d" role="img" data-i18n-aria="b3d_aria" aria-label="3D drawing of two teams of squads; lines are sight checks"></div>
+    <p class="note" data-i18n="b3d_note">Simplified model, not the game's code. The counts are worked out live from the soldiers shown;
+      with many lines, only some of them are drawn. Shaded squares are areas with soldiers of that team in them. The
+      more soldiers stand in one area, the bigger the difference.</p>
+  </div>
+
+  <div class="overlay card" style="padding:0">
+    <img src="img/firefight.jpg" alt="A battle, with a drawing of the shared areas on top" data-i18n-alt="ovl_alt">
+    <span class="badge" data-i18n="badge">DRAWING · shared areas</span>
+    <svg id="ovl" viewBox="0 0 1200 394" preserveAspectRatio="none" aria-hidden="true"></svg>
+  </div>
+
+  <div class="card">
+    <h3 data-i18n="speed_h">Work per step</h3>
+    <p class="sub" data-i18n="speed_sub">Million CPU cycles per step. Lower is faster.</p>
+    <div class="legend" id="lgSpeed"></div>
+    <div id="chSpeed"></div>
+    <details><summary data-i18n="show">Show the numbers</summary><table id="tbSpeed"></table></details>
+  </div>
+
+  <div class="card">
+    <h3 data-i18n="scale_h">Work per unit as battles get bigger</h3>
+    <p class="sub" data-i18n="scale_sub">Million CPU cycles per unit and step, in a small, a medium and a large battle with infantry, guns
+      and tanks (the large one has about 1,700 units). In the base game every unit costs more when there are more
+      units. With Style v1 the cost per unit stays almost flat, so the gap grows with the battle.</p>
+    <div class="legend" id="lgScale"></div>
+    <div id="chScale"></div>
+    <details><summary data-i18n="show">Show the numbers</summary><table id="tbScale"></table></details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="note" data-i18n="foot">Most numbers were measured on our test computer (a virtual machine with 2 CPU cores and 24 GB of memory). Memory
+      used by graphics is different on a normal PC.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  I18N_apply();  // page text in the chosen language (i18n.js)
+  // ---------- theme toggle ----------
+  const root = document.documentElement, btn = document.getElementById('themeToggle');
+  function cur() { return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
+  try { const t = localStorage.getItem('mo-theme'); if (t) root.dataset.theme = t; } catch (e) {}
+  btn.textContent = cur() === 'dark' ? T('light') : T('dark');
+  btn.addEventListener('click', () => {
+    root.dataset.theme = cur() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem('mo-theme', root.dataset.theme); } catch (e) {}
+    btn.textContent = cur() === 'dark' ? T('light') : T('dark');
+  });
+
+  // ---------- helpers ----------
+  const NS = 'http://www.w3.org/2000/svg';
+  const tip = document.getElementById('tip');
+  const fmt = n => n.toLocaleString(window.LOCALE || 'en-US');
+  const fmt1 = n => n.toLocaleString(window.LOCALE || 'en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const MB = ' ' + T('MB');
+  function el(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function showTip(html, ev) {
+    tip.innerHTML = html; tip.style.opacity = 1;
+    const x = Math.min(ev.clientX + 14, innerWidth - tip.offsetWidth - 8), y = ev.clientY - tip.offsetHeight - 12;
+    tip.style.left = x + 'px'; tip.style.top = (y < 8 ? ev.clientY + 16 : y) + 'px';
+  }
+  function hideTip() { tip.style.opacity = 0; }
+  function hover(node, html) {
+    node.addEventListener('pointermove', ev => showTip(html, ev));
+    node.addEventListener('pointerleave', hideTip);
+  }
+  function table(id, head, rows) {
+    const t = document.getElementById(id);
+    t.innerHTML = '<tr>' + head.map(h => '<th>' + T(h) + '</th>').join('') + '</tr>' +
+      rows.map(r => '<tr>' + r.map(c => '<td>' + (typeof c === 'number' ? fmt(c) : T(String(c))) + '</td>').join('') + '</tr>').join('');
+  }
+  function legend(id, items) {
+    document.getElementById(id).innerHTML = items.map(([c, n]) => '<span><i style="background:var(' + c + ')"></i>' + T(n) + '</span>').join('');
+  }
+  function scale(dmax) {  // -> {max, n}: n ticks of a round step (1 / 2 / 5 x 10^k)
+    const raw = dmax / 5, p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p;
+    const step = (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p, n = Math.ceil(dmax / step - 1e-9);
+    return { max: n * step, n };
+  }
+  const cw = (id, d) => Math.max(280, Math.round(document.getElementById(id).clientWidth)) || d;
+
+  // Horizontal bars. rows: [label, value, colorVar, note?]
+  function hbars(id, rows, unit, opt = {}) {
+    const W = cw(id, 520), rowH = 34, padL = Math.min(opt.padL || 120, Math.round(W * 0.42)), padR = Math.min(90, Math.round(W * 0.18)), H = rows.length * rowH + 22;
+    const sc = scale(Math.max(...rows.map(r => r[1]))), max = sc.max;
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': opt.aria || id });
+    const x = v => padL + (W - padL - padR) * v / max;
+    for (let i = 0; i <= sc.n; i++) {
+      const v = max * i / sc.n, X = x(v);
+      el('line', { x1: X, x2: X, y1: 0, y2: H - 18, stroke: 'var(--grid)' }, svg);
+      el('text', { x: X, y: H - 4, 'text-anchor': 'middle', class: 'ax' }, svg).textContent = fmt(v);
+    }
+    rows.forEach(([label, v, c, note], i) => {
+      const y = i * rowH + 6, h = rowH - 12;
+      el('text', { x: padL - 10, y: y + h / 2 + 4, 'text-anchor': 'end', class: 'lbl2' }, svg).textContent = label;
+      const w = Math.max(2, x(v) - padL);
+      el('path', { d: `M${padL},${y} h${w - 4} q4,0 4,4 v${h - 8} q0,4 -4,4 h${-(w - 4)} z`, fill: `var(${c})` }, svg);
+      el('text', { x: padL + w + 6, y: y + h / 2 + 4, class: 'lbl' }, svg).textContent = fmt(v) + (unit ? ' ' + unit : '');
+      const hit = el('rect', { x: 0, y: y - 4, width: W, height: rowH, fill: 'transparent' }, svg);
+      hover(hit, `<b>${label}</b><br>${fmt(v)} ${unit}${note ? '<br>' + note : ''}`);
+    });
+    document.getElementById(id).appendChild(svg);
+  }
+
+  // Lines. series: [{name, color, pts:[[x,y],...]}], xs labels
+  function lines(id, xs, series, opt) {
+    const W = cw(id, 560), H = 260, padL = 52, padR = 90, padT = 12, padB = 30;
+    const all = series.flatMap(s => s.pts.map(p => p[1]));
+    const lo = opt.lo, hi = opt.hi;
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': opt.aria });
+    const x = i => padL + (W - padL - padR) * i / (xs.length - 1);
+    const y = v => padT + (H - padT - padB) * (1 - (v - lo) / (hi - lo));
+    for (let i = 0; i <= 4; i++) {
+      const v = lo + (hi - lo) * i / 4;
+      el('line', { x1: padL, x2: W - padR, y1: y(v), y2: y(v), stroke: 'var(--grid)' }, svg);
+      el('text', { x: padL - 8, y: y(v) + 4, 'text-anchor': 'end', class: 'ax' }, svg).textContent = fmt(Math.round(v));
+    }
+    xs.forEach((l, i) => { el('text', { x: x(i), y: H - 8, 'text-anchor': 'middle', class: 'ax' }, svg).textContent = T(l); });
+    series.forEach(s => {
+      el('path', { d: s.pts.map((p, i) => (i ? 'L' : 'M') + x(i) + ',' + y(p)).join(''), fill: 'none', stroke: `var(${s.color})`, 'stroke-width': 2, 'stroke-linejoin': 'round' }, svg);
+      s.pts.forEach((p, i) => el('circle', { cx: x(i), cy: y(p), r: 4, fill: `var(${s.color})`, stroke: 'var(--surface-1)', 'stroke-width': 2 }, svg));
+      const last = s.pts.length - 1;
+      el('text', { x: x(last) + 10, y: y(s.pts[last]) + 4, class: 'lbl' }, svg).textContent = T(s.name);
+    });
+    // crosshair
+    const cross = el('line', { y1: padT, y2: H - padB, stroke: 'var(--text-muted)', 'stroke-dasharray': '3 3', opacity: 0 }, svg);
+    const hit = el('rect', { x: padL, y: 0, width: W - padL - padR, height: H - padB, fill: 'transparent' }, svg);
+    hit.addEventListener('pointermove', ev => {
+      const r = svg.getBoundingClientRect(), px = (ev.clientX - r.left) * W / r.width;
+      const i = Math.max(0, Math.min(xs.length - 1, Math.round((px - padL) / ((W - padL - padR) / (xs.length - 1)))));
+      cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('opacity', 1);
+      showTip(`<b>${T(xs[i])}</b><br>` + series.map(s => `${T(s.name)}: ${fmt(s.pts[i])} ${opt.unit}`).join('<br>'), ev);
+    });
+    hit.addEventListener('pointerleave', () => { cross.setAttribute('opacity', 0); hideTip(); });
+    document.getElementById(id).appendChild(svg);
+  }
+
+  // Paired bars (two series per group), vertical
+  function paired(id, groups, a, b, opt) {
+    const W = cw(id, 300), H = 200, padL = 40, padB = 26, padT = 18;
+    const sc = scale(Math.max(...groups.flatMap(g => [g[1], g[2]]))), max = sc.max;
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': opt.aria });
+    const y = v => padT + (H - padT - padB) * (1 - v / max);
+    for (let i = 0; i <= sc.n; i++) {
+      const v = max * i / sc.n;
+      el('line', { x1: padL, x2: W, y1: y(v), y2: y(v), stroke: 'var(--grid)' }, svg);
+      el('text', { x: padL - 6, y: y(v) + 4, 'text-anchor': 'end', class: 'ax' }, svg).textContent = fmt(v);
+    }
+    const gw = (W - padL) / groups.length, bw = Math.min(28, gw / 3);
+    groups.forEach(([label, va, vb], i) => {
+      label = T(label);
+      const cx = padL + gw * i + gw / 2;
+      [[va, a, -1], [vb, b, 1]].forEach(([v, s, side]) => {
+        const X = cx + (side < 0 ? -bw - 1 : 1), Y = y(v), h = y(0) - Y;
+        el('path', { d: `M${X},${y(0)} v${-(h - 4)} q0,-4 4,-4 h${bw - 8} q4,0 4,4 v${h - 4} z`, fill: `var(${s[0]})` }, svg);
+        el('text', { x: X + bw / 2, y: Y - 4, 'text-anchor': 'middle', class: 'lbl2' }, svg).textContent = fmt(v);
+      });
+      el('text', { x: cx, y: H - 8, 'text-anchor': 'middle', class: 'ax' }, svg).textContent = label;
+      const hit = el('rect', { x: cx - gw / 2, y: 0, width: gw, height: H - padB, fill: 'transparent' }, svg);
+      hover(hit, `<b>${label}</b><br>${T(a[1])}: ${fmt(va)}<br>${T(b[1])}: ${fmt(vb)}`);
+    });
+    document.getElementById(id).appendChild(svg);
+  }
+
+  // ---------- 01 waffle ----------
+  const regions = [  // MB, measured: RobZ 1.30.10 MP match (Bastogne Town 1v1), patched, region dump
+    ['--s1', 'Game data', 904],
+    ['--s2', 'Graphics driver (test computer)', 419],
+    ['--s4', 'Reserve', 256],
+    ['--s3', 'Game program files', 169],
+    ['--s5', 'Other', 108],
+  ];
+  const used = regions.reduce((a, r) => a + r[2], 0), freeMB = 4096 - used;
+  const waf = document.getElementById('waffle');
+  let cells = [];
+  regions.forEach(r => { for (let i = 0; i < Math.round(r[2] / 16); i++) cells.push(r); });
+  while (cells.length < 256) cells.push(['--free', 'Free', freeMB]);
+  cells = cells.slice(0, 256);
+  cells.forEach((r, i) => {
+    const s = document.createElement('span');
+    s.style.background = `var(${r[0]})`;
+    s.addEventListener('pointermove', ev => showTip(`<b>${T(r[1])}</b><br>${fmt(r[2])}${MB}`, ev));
+    s.addEventListener('pointerleave', hideTip);
+    waf.appendChild(s);
+  });
+  legend('wafLegend', regions.map(r => [r[0], `${T(r[1])} · ${fmt(r[2])}${MB}`]).concat([['--free', `${T('Free')} · ${fmt(freeMB)}${MB}`]]));
+  table('wafTable', ['region', 'MB'], regions.map(r => [r[1], r[2]]).concat([['Free', freeMB], ['Total', 4096]]));
+
+  // ---------- 02 vaults ----------
+  // RobZ: 1.0.0 profile, Bulge r2. Valour: Randy's 4v4 replay, rev4 debug, peak report at 657 s (geometry 405,
+  // animation 186, sound 30, surface 25 = 646 MB; five other runs 644-652)
+  const vaults = [['Geometry', 109, 405], ['Animation', 82, 186], ['Sound', 51, 30], ['Surface', 209, 25]];
+  hbars('chVaultTotal', [['RobZ', 451, '--s2'], ['Valour', 646, '--s1']], T('MB'), { padL: 70, aria: 'Total MB kept outside the 4 GB' });
+  legend('lgVaults', [['--s2', 'RobZ'], ['--s1', 'Valour']]);
+  paired('chVaults', vaults, ['--s2', 'RobZ'], ['--s1', 'Valour'], { aria: 'MB kept outside the 4 GB by kind of data' });
+  table('tbVaults', ['kind', 'RobZ MB', 'Valour MB'], vaults.map(v => [v[0], v[1], v[2]]).concat([['Total', 451, 646]]));
+
+  // ---------- 03 leaks ----------
+  const rounds = ['start', '1', '2', '3', '4', '5', '6'];
+  const old = [2482, 2570, 2644, 2649, 2712, 2752, 2793], now = [2508, 2550, 2571, 2587, 2590, 2608, 2602];
+  legend('lgLeaks', [['--s2', 'Without this fix'], ['--s1', 'With this fix']]);
+  lines('chLeaks', rounds, [{ name: 'without', color: '--s2', pts: old }, { name: 'with', color: '--s1', pts: now }],
+        { lo: 2400, hi: 2800, unit: T('MB'), aria: 'Address space in use after each restart' });
+  table('tbLeaks', ['restarts', 'without the fix (MB)', 'with the fix (MB)'], rounds.map((r, i) => [r, old[i], now[i]]));
+
+  // ---------- 06 Style v1 ----------
+  legend('lgSpeed', [['--s2', 'Base game'], ['--s1', 'Style v1']]);
+  const sp = [['800 soldiers', 2444, 266], ['1,000 soldiers', 4034, 406], ['1,700 + guns, tanks', 7751, 1377]];
+  const spRows = [];
+  sp.forEach(s => { spRows.push([T(s[0]) + ' · ' + T('base game'), s[1], '--s2']); spRows.push([T(s[0]) + ' · Style v1', s[2], '--s1', T('{x}× less work', { x: fmt1(s[1] / s[2]) })]); });
+  hbars('chSpeed', spRows, 'M', { padL: 210, aria: 'Work per step' });
+  table('tbSpeed', ['battle', 'base game (million cycles)', 'Style v1', 'less work'], sp.map(s => [s[0], s[1], s[2], fmt1(s[1] / s[2]) + '×']));
+
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // bars and lines grow in once the chart is on screen
+  function growIn(svg, nodes) {
+    if (reduceMotion) return;
+    nodes.forEach(n => { n.style.transformBox = 'fill-box'; n.style.transformOrigin = '50% 100%'; n.style.transform = 'scaleY(0)'; n.style.transition = 'transform .9s cubic-bezier(.2,.8,.2,1)'; });
+    new IntersectionObserver((es, ob) => {
+      if (!es[0].isIntersecting) return;
+      ob.disconnect();
+      nodes.forEach((n, i) => setTimeout(() => { n.style.transform = 'scaleY(1)'; }, 120 * i));
+    }, { threshold: 0.35 }).observe(svg);
+  }
+
+  // mixed scenes mxS / mxM / mxL (Gazala, 40 s, seed 12345): main-thread Mcyc per awake unit at 10 s
+  legend('lgScale', [['--s2', 'Base game'], ['--s1', 'Style v1']]);
+  const sz = ['Small battle', 'Medium battle', 'Large battle (~1,700 units)'], sb = [0.60, 2.09, 3.91], st = [0.21, 0.35, 0.57];
+  (function () {
+    const id = 'chScale', W = cw(id, 560), H = 312, padL = 44, padR = 12, padT = 50, padB = 40;
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Work per unit by battle size' });
+    const max = 4, y = v => padT + (H - padT - padB) * (1 - v / max), gw = (W - padL - padR) / sz.length;
+    const bw = Math.min(56, gw * 0.3);
+    for (let v = 0; v <= max; v++) {
+      el('line', { x1: padL, x2: W - padR, y1: y(v), y2: y(v), stroke: 'var(--grid)' }, svg);
+      el('text', { x: padL - 8, y: y(v) + 4, 'text-anchor': 'end', class: 'ax' }, svg).textContent = v;
+    }
+    const grow = [], tops = [[], []];
+    sz.forEach((label, i) => {
+      const cx = padL + gw * i + gw / 2;
+      [[sb[i], '--s2', -1], [st[i], '--s1', 1]].forEach(([v, c, side], k) => {
+        const X = side < 0 ? cx - bw - 3 : cx + 3, Y = y(v), h = y(0) - Y;
+        grow.push(el('rect', { x: X, y: Y, width: bw, height: Math.max(1, h), rx: 4, fill: `var(${c})` }, svg));
+        el('text', { x: X + bw / 2, y: Y - 6, 'text-anchor': 'middle', class: 'lbl' }, svg).textContent = v.toLocaleString(window.LOCALE || 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        tops[k].push([X + bw / 2, Y]);
+      });
+      // the gap as a badge between the pair
+      const g = el('g', {}, svg), txt = T('{x}× less', { x: fmt1(sb[i] / st[i]) });
+      const tw = txt.length * 7 + 14, gy = Math.min(y(sb[i]) - 30, y(st[i]) - 30);
+      el('rect', { x: cx - tw / 2, y: gy - 14, width: tw, height: 20, rx: 10, fill: 'var(--surface-2)', stroke: 'var(--line)' }, g);
+      el('text', { x: cx, y: gy, 'text-anchor': 'middle', class: 'lbl', style: 'font-size:11px' }, g).textContent = txt;
+      el('text', { x: cx, y: H - 14, 'text-anchor': 'middle', class: 'ax', style: 'font-size:12px' }, svg).textContent = W < 420 ? T(label).split(' ')[0] : T(label);
+      const hit = el('rect', { x: cx - gw / 2, y: 0, width: gw, height: H - padB, fill: 'transparent' }, svg);
+      hover(hit, `<b>${T(label)}</b><br>${T('base game')}: ${sb[i]} ${T('M per unit')}<br>Style v1: ${st[i]} ${T('M per unit')}`);
+    });
+    // trend lines through the bar tops: steep for the base game, flat for Style v1
+    tops.forEach((pts, k) => el('path', { d: pts.map((p, i) => (i ? 'L' : 'M') + p[0] + ',' + p[1]).join(''), fill: 'none',
+      stroke: `var(${k ? '--s1' : '--s2'})`, 'stroke-width': 2, 'stroke-dasharray': '5 4', opacity: 0.8 }, svg));
+    el('text', { x: padL, y: 14, class: 'ax' }, svg).textContent = T('million cycles per unit');
+    document.getElementById(id).appendChild(svg);
+    growIn(svg, grow);
+  })();
+  table('tbScale', ['battle', 'base game', 'Style v1', 'less work'], sz.map((s, i) => [s, sb[i], st[i], fmt1(sb[i] / st[i]) + '×']));
+
+  // schematic overlay on the firefight shot: shared-sight cells and two team sight radii
+  const o = document.getElementById('ovl');
+  for (let x = 0; x <= 1200; x += 60) el('line', { x1: x, x2: x, y1: 0, y2: 394, stroke: 'rgba(240,239,236,.14)' }, o);
+  for (let y = 0; y <= 394; y += 60) el('line', { x1: 0, x2: 1200, y1: y, y2: y, stroke: 'rgba(240,239,236,.14)' }, o);
+  [[540, 60], [600, 60], [600, 120], [480, 120], [660, 120], [540, 120]].forEach(([x, y]) =>
+    el('rect', { x, y, width: 60, height: 60, fill: 'rgba(57,135,229,.22)', stroke: 'rgba(57,135,229,.9)' }, o));
+  [[360, 180], [420, 180], [420, 240]].forEach(([x, y]) =>
+    el('rect', { x, y, width: 60, height: 60, fill: 'rgba(217,89,38,.22)', stroke: 'rgba(217,89,38,.9)' }, o));
+  el('circle', { cx: 600, cy: 210, r: 150, fill: 'none', stroke: 'rgba(240,239,236,.55)', 'stroke-dasharray': '6 5' }, o);
+  const t1 = el('text', { x: 1185, y: 52, 'text-anchor': 'end', fill: '#f0efec', 'font-size': 13, 'font-family': 'JetBrains Mono, monospace' }, o);
+  t1.textContent = T('one check per area, used by every soldier in it');
+  const t2 = el('text', { x: 300, y: 320, fill: '#f0efec', 'font-size': 13, 'font-family': 'JetBrains Mono, monospace' }, o);
+  t2.textContent = T('other team: its own areas');
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="sims.js"></script>
+</body>
+</html>
