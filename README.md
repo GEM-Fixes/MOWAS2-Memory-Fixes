@@ -14,6 +14,8 @@ This started as a patch among friends to play [RobZ](https://steamcommunity.com/
 
 It has expanded far beyond its original goal and all of this has only been possible with the help and contributions of the community with contributions from many different people.
 
+**[How it works](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/)**: what the patch does, explained simply, with measurements and animations.
+
 ## How to install
 
 1. Close the game.
@@ -93,6 +95,8 @@ You can turn both off. Untick the two boxes at the bottom of the launcher.
 Игра — 32-битная программа и может одновременно использовать только 4 ГБ памяти. Патч позволяет ей расходовать это место гораздо эффективнее и использовать больше памяти вашего компьютера, поэтому большие моды и долгие матчи помещаются. Игра по-прежнему 32-битная, но теперь далеко выходит за пределы оригинала: модовые матчи 8 на 8 больше не вылетают из-за нехватки памяти, даже с 10 и более разными фракциями.
 
 Проще говоря: это самый эффективный и лучший способ играть в Men of War: Assault Squad 2 — без исключений.
+
+**[Как это работает](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/?lang=ru)**: что делает патч, простыми словами, с замерами и анимациями.
 
 ### Как установить
 
@@ -174,6 +178,8 @@ El juego es un programa de 32 bits y solo puede usar 4 GB de memoria a la vez. E
 
 En pocas palabras: es la forma más eficiente y la mejor de jugar a Men of War: Assault Squad 2, sin excepción.
 
+**[Cómo funciona](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/?lang=es)**: qué hace el parche, explicado de forma sencilla, con mediciones y animaciones.
+
 ### Cómo instalarlo
 
 1. Cierra el juego.
@@ -254,6 +260,8 @@ Das Spiel ist ein 32-Bit-Programm und kann gleichzeitig nur 4 GB Speicher nutzen
 
 Kurz gesagt: Das ist die effizienteste und beste Art, Men of War: Assault Squad 2 zu spielen – ohne Ausnahme.
 
+**[So funktioniert es](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/?lang=de)**: was der Patch macht, einfach erklärt, mit Messwerten und Animationen.
+
 ### So installierst du ihn
 
 1. Schließe das Spiel.
@@ -333,6 +341,8 @@ Du kannst beides ausschalten. Entferne die zwei Häkchen unten im Launcher.
 本游戏是 32 位程序，同一时间最多只能使用 4 GB 内存。补丁让游戏更高效地利用这部分空间，并能使用更多电脑内存，因此大型模组和长时间对战也能顺利运行。虽然它仍是 32 位游戏，但现在已远远超出原版游戏的极限：使用模组的 8v8 对战不再因内存不足而崩溃，即使有 10 个甚至更多不同阵营也是如此。
 
 简而言之：这是游玩《Men of War: Assault Squad 2》最高效、最好的方式，没有之一。
+
+**[工作原理](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/?lang=zh)**：用简单的话说明补丁做了什么，附实测数据和动画。
 
 ### 如何安装
 
