@@ -107,7 +107,7 @@ The 64-bit build works with the same mods as the 32-bit game.
 You get the 64-bit build **only through the launcher**. It is not on GitHub and there is no separate download.
 
 1. Install the launcher as described above and open it.
-2. In the **Game to start** box, click **Install 64-bit**. The launcher downloads the 64-bit build, checks it against the signed update list, places it in the game folder next to `mowas_2.exe` and selects it.
+2. In the **Game to start** box, click **Install 64-bit**.
 3. Click **Play (64-bit)**.
 
 Both can stay installed: pick **32-bit game with the fix** or **64-bit build** in **Game to start**. **Uninstall 64-bit** removes the 64-bit build again; the 32-bit patch is not touched.
