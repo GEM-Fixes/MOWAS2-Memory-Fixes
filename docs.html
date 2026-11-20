@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Documentation</title>
-<meta name="description" content="Reference for the MoWAS2 Memory Optimizer Patch and its launcher: install, settings, multiplayer, reports, troubleshooting.">
+<meta name="description" content="Reference for the MoWAS2 Memory Optimizer Patch and its launcher: install, multiplayer, reports, troubleshooting.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -162,7 +162,6 @@ footer { padding: 48px 0 72px; color: var(--text-muted); font-size: 14px; }
     <li><a href="#x64" data-i18n="doc_toc_x64">64-bit build</a></li>
     <li><a href="#channels" data-i18n="doc_toc_channels">Update channels</a></li>
     <li><a href="#launcher" data-i18n="doc_toc_launcher">The launcher window</a></li>
-    <li><a href="#settings" data-i18n="doc_toc_settings">Settings</a></li>
     <li><a href="#mp" data-i18n="doc_toc_mp">Multiplayer</a></li>
     <li><a href="#reports" data-i18n="doc_toc_reports">Crash and out-of-sync reports</a></li>
     <li><a href="#trouble" data-i18n="doc_toc_trouble">Troubleshooting</a></li>
@@ -231,8 +230,6 @@ footer { padding: 48px 0 72px; color: var(--text-muted); font-size: 14px; }
   <p data-i18n="doc_x64_m">The 64-bit build is compatible with unpatched versions of the game: 64-bit players can play multiplayer with players of the <a href="index.html">32-bit patch</a> and with players who run the normal, unpatched game. Turbo mode is only on when everyone in the match has it. See <a href="#mp">Multiplayer compatibility</a>.</p>
   <h3 data-i18n="doc_x64_w_h">32-bit patch or 64-bit build?</h3>
   <p data-i18n="doc_x64_w">Both fix the memory crashes: the patch keeps unused data outside the 4 GB, the 64-bit build has no 4 GB limit. With the patch we know of no mod that cannot be played. Both have the same speed fixes and the same turbo mode 1.0.0. 64-bit alone does not make battles faster. More on the <a href="x64.html#speed">64-bit page</a>.</p>
-  <h3 data-i18n="doc_x64_ini_h">Settings</h3>
-  <p data-i18n="doc_x64_ini">The <code>memhook.ini</code> settings belong to the <a href="index.html">32-bit patch</a> and do not apply to the 64-bit build. Most of them move data around inside the 4 GB, which the 64-bit build does not need.</p>
 </section>
 
 <section id="channels">
@@ -264,68 +261,8 @@ footer { padding: 48px 0 72px; color: var(--text-muted); font-size: 14px; }
 </section>
 
 
-<section id="settings">
-  <div class="eyebrow">4</div>
-  <h2 data-i18n="doc_set_h">Settings</h2>
-  <p data-i18n="doc_set_p1">The patch needs no settings file. Everything is on by default. To switch a single feature off, create a text file called <code>memhook.ini</code> in the game folder (next to <code>mowas_2.exe</code>). Put the line <code>[memhook]</code> in it, and below it the feature with <code>=0</code>. Only change these if asked.</p>
-  <div class="card"><pre class="mono" style="margin:0;font-size:13px;overflow-x:auto">[memhook]
-pakalias=0</pre></div>
-  <p class="note" data-i18n="doc_set_p2">This example switches off the sharing of duplicate files.</p>
-
-  <h3 data-i18n="doc_set_k_h">Main keys</h3>
-  <div class="tablebox keys"><table>
-    <thead><tr><th data-i18n="doc_k0">Key</th><th data-i18n="doc_k1">What it controls</th></tr></thead>
-    <tbody>
-      <tr><td>surfvault</td><td data-i18n="doc_k_surfvault">Textures kept outside the 4 GB.</td></tr>
-      <tr><td>hwvault</td><td data-i18n="doc_k_hwvault">Model data kept outside the 4 GB.</td></tr>
-      <tr><td>sndvault</td><td data-i18n="doc_k_sndvault">Sounds kept outside the 4 GB.</td></tr>
-      <tr><td>animvault</td><td data-i18n="doc_k_animvault">Animation data kept outside the 4 GB.</td></tr>
-      <tr><td>slab</td><td data-i18n="doc_k_slab">Small memory blocks stored tightly.</td></tr>
-      <tr><td>roundtrap</td><td data-i18n="doc_k_roundtrap">Map leak cleanup between battles.</td></tr>
-      <tr><td>pakalias</td><td data-i18n="doc_k_pakalias">Shared duplicate files.</td></tr>
-      <tr><td>zone_mb</td><td data-i18n="doc_k_zone">Reserve for big memory requests. <code>zone_mb=0</code> switches it off.</td></tr>
-      <tr><td>no_preload_cache</td><td data-i18n="doc_k_nopreload">The definition file cache.</td></tr>
-      <tr><td>fast_sim</td><td data-i18n="doc_k_fastsim">Faster simulation.</td></tr>
-      <tr><td>stream_vault</td><td data-i18n="doc_k_stream">Music outside the 4 GB.</td></tr>
-      <tr><td>lean_index</td><td data-i18n="doc_k_lean">Smaller list of the game's files.</td></tr>
-      <tr><td>tag_slim</td><td data-i18n="doc_k_tag">Smaller interaction rules.</td></tr>
-      <tr><td>lazy_rules</td><td data-i18n="doc_k_lazy">Interaction rules read when a map loads, not at start.</td></tr>
-      <tr><td>ui_scale_option</td><td data-i18n="doc_k_ui">The "UI scale" row in Options &gt; Video and everything behind it.</td></tr>
-      <tr><td>zip_cache</td><td data-i18n="doc_k_zip">Archive read cache.</td></tr>
-      <tr><td>mount_once</td><td data-i18n="doc_k_mount">The base game is mounted once at start.</td></tr>
-      <tr><td>no_splash_wait</td><td data-i18n="doc_k_splash">No 5-second splash wait.</td></tr>
-      <tr><td>fast_tga</td><td data-i18n="doc_k_tga">Faster image decoder.</td></tr>
-      <tr><td>group_buffers</td><td data-i18n="doc_k_group">Static map geometry created once.</td></tr>
-      <tr><td>oos_log</td><td data-i18n="doc_k_oos">Out-of-sync reports written to <code>log\oos</code>.</td></tr>
-      <tr><td>fps_limit</td><td data-i18n="doc_k_fps">Frame limit with vertical sync off. <code>fps_limit=N</code> sets another limit (for example 144), <code>-1</code> removes the limit completely (a CPU core then runs flat out, even in the menus), <code>0</code> leaves the game's own behaviour.</td></tr>
-    </tbody>
-  </table></div>
-
-  <h3 data-i18n="doc_set_d_h">More keys, from the debug package settings file</h3>
-  <p data-i18n="doc_set_d_p">The debug package's <code>memhook.ini</code> lists more keys, with a one-line comment each.</p>
-  <div class="tablebox keys"><table>
-    <thead><tr><th data-i18n="doc_k0b">Key</th><th data-i18n="doc_k1b">What it controls</th></tr></thead>
-    <tbody>
-      <tr><td>load_cache</td><td data-i18n="doc_d_loadcache">Faster start and faster entry into multiplayer: remembers checksums of resource files between runs.</td></tr>
-      <tr><td>fast_handoff</td><td data-i18n="doc_d_handoff">Faster map loading: texture loader hand-offs.</td></tr>
-      <tr><td>fast_lex</td><td data-i18n="doc_d_lex">Faster reading of the game's text files.</td></tr>
-      <tr><td>fast_zip</td><td data-i18n="doc_d_fastzip">Faster reading of uncompressed archive entries and faster archive checksums.</td></tr>
-      <tr><td>load_evict</td><td data-i18n="doc_d_loadevict">While a map loads, idle data is moved out of the 4 GB about once a second.</td></tr>
-      <tr><td>par_workers</td><td data-i18n="doc_d_par">Helper threads for the parts that can run on several cores. -1 = one per extra logical core, 0 = off.</td></tr>
-      <tr><td>sync_slim</td><td data-i18n="doc_d_syncslim">Multiplayer: no per-second sync snapshots and no huge out-of-sync report. The sync check itself is unchanged. Set to 0 to get the game's full report in <code>log\oos</code>.</td></tr>
-      <tr><td>dynamic_delay, dynamic_delay_min</td><td data-i18n="doc_d_dyn">Multiplayer host: the minimum batch of simulation time (the game's own value is 100 ms). Only the host's setting counts. 0 = the game's own 100 ms.</td></tr>
-      <tr><td>watch_fix</td><td data-i18n="doc_d_watch">Spectators: switching the watched player no longer causes an out-of-sync on that PC. 0 = the game's own behaviour.</td></tr>
-      <tr><td>fs_borderless</td><td data-i18n="doc_d_fs">Fullscreen without display mode switches: a borderless window covering the monitor, so alt-tab works without resolution changes. 0 = the game's own exclusive fullscreen.</td></tr>
-      <tr><td>render_scale</td><td data-i18n="doc_d_rs">Fullscreen at a resolution below the monitor's: the 3D picture is drawn at the chosen resolution and enlarged, the interface is drawn at the monitor's own pixels. -1 automatic, 1 always, 0 off.</td></tr>
-      <tr><td>dof_off</td><td data-i18n="doc_d_dof">The High / Ultra presets no longer switch depth of field on. Ticking it in Options &gt; Video still turns it on. 0 = the game's own behaviour.</td></tr>
-      <tr><td>ui_scale</td><td data-i18n="doc_d_uiscale">Factor in percent used when the profile has no value yet (100 = off).</td></tr>
-      <tr><td>interval_ms, frame_log, hitch_prof</td><td data-i18n="doc_d_diag">Logging and diagnostics for the debug build. Leave as they are unless asked.</td></tr>
-    </tbody>
-  </table></div>
-</section>
-
 <section id="mp">
-  <div class="eyebrow">5</div>
+  <div class="eyebrow">4</div>
   <h2 data-i18n="doc_mp_h">Multiplayer compatibility</h2>
   <ul>
     <li data-i18n="doc_mp_1"><b>Compatible with the unpatched game.</b> Players with the <a href="index.html">32-bit patch</a> or the <a href="#x64">64-bit build</a> can play multiplayer together with players who run the normal, unpatched game. The match then plays in vanilla compatibility mode.</li>
@@ -337,7 +274,7 @@ pakalias=0</pre></div>
 </section>
 
 <section id="reports">
-  <div class="eyebrow">6</div>
+  <div class="eyebrow">5</div>
   <h2 data-i18n="doc_rep_h">Crash and out-of-sync reports</h2>
   <h3 data-i18n="doc_rep_l_h">What the launcher sends</h3>
   <ul>
@@ -353,7 +290,7 @@ pakalias=0</pre></div>
 </section>
 
 <section id="trouble">
-  <div class="eyebrow">7</div>
+  <div class="eyebrow">6</div>
   <h2 data-i18n="doc_tr_h">Troubleshooting</h2>
   <p data-i18n="doc_tr_p0">Always include <code>game.log</code>, your mod list and the map when you report a problem.</p>
 
@@ -377,7 +314,7 @@ pakalias=0</pre></div>
 </section>
 
 <section id="faq">
-  <div class="eyebrow">8</div>
+  <div class="eyebrow">7</div>
   <h2 data-i18n="doc_faq_h">FAQ</h2>
   <details class="faq"><summary data-i18n="doc_q1">Does it work with all mods?</summary><p data-i18n="doc_a1">Yes, that is the aim. Problems with a particular mod are welcome as reports.</p></details>
   <details class="faq"><summary data-i18n="doc_q2">Does it change my game files?</summary><p data-i18n="doc_a2">No. It is a single DLL that the game loads by itself. The only file it replaces is <code>xvidcore.dll</code>, and your original is kept as <code>xvidcore_orig.dll</code>.</p></details>
@@ -385,7 +322,6 @@ pakalias=0</pre></div>
   <details class="faq"><summary data-i18n="doc_q4">Do I have to use the launcher?</summary><p data-i18n="doc_a4">For the <a href="#x64">64-bit build</a>, yes: you get it only through the launcher. For the <a href="index.html">32-bit patch</a> it is recommended: it updates the patch and sends reports. Without it you update and report by hand.</p></details>
   <details class="faq"><summary data-i18n="doc_q5">Is the game still 32-bit with the patch?</summary><p data-i18n="doc_a5">Yes. The patch works inside the 4 GB limit. A separate <a href="#x64">64-bit build</a> is available without this limit. Both fix the memory crashes.</p></details>
   <details class="faq"><summary data-i18n="doc_q7">Will the 64-bit build make big battles faster?</summary><p data-i18n="doc_a7">64-bit alone does not. What makes big battles much faster is turbo mode (Style v1), which both the <a href="index.html#style">32-bit patch</a> and the 64-bit build have. It is used in multiplayer when every player in the match has it. See the <a href="x64.html#speed">64-bit page</a>.</p></details>
-  <details class="faq"><summary data-i18n="doc_q6">How do I switch a feature off?</summary><p data-i18n="doc_a6">Create <code>memhook.ini</code> as described under Settings.</p></details>
 </section>
 
 </main>
