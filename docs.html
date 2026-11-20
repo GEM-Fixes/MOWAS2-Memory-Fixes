@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en" data-title-key="doc_title">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Documentation</title>
+<meta name="description" content="Reference for the MoWAS2 Memory Optimizer Patch and its launcher: install, settings, multiplayer, reports, troubleshooting.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f3ef; --surface-1: #fcfcfb; --surface-2: #ecebe6; --line: #d9d8d2; --grid: #e6e5df;
+  --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #7a7974; --accent: #2a78d6;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --free: #dcdbd5; --hero-ink: #f0efec;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --bg: #121211; --surface-1: #1a1a19; --surface-2: #232321; --line: #34332f; --grid: #2a2a27;
+    --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #8f8e86; --accent: #3987e5;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --free: #2e2e2b;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121211; --surface-1: #1a1a19; --surface-2: #232321; --line: #34332f; --grid: #2a2a27;
+  --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #8f8e86; --accent: #3987e5;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --free: #2e2e2b;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text-primary); font: 16px/1.6 Inter, system-ui, sans-serif; overflow-x: hidden; }
+.mono, code, .k { font-family: "JetBrains Mono", ui-monospace, monospace; }
+code { font-size: .9em; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+a { color: var(--accent); }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+/* top bar with nav */
+.site { background: var(--surface-1); border-bottom: 1px solid var(--line); }
+.site .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding-top: 10px; padding-bottom: 10px; }
+.nav { display: flex; flex-wrap: wrap; gap: 4px 6px; }
+.nav a { font: 500 13px/1 "JetBrains Mono", monospace; padding: 8px 10px; border-radius: 6px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; }
+.nav a:hover { border-color: var(--line); }
+.nav a[aria-current="page"] { background: var(--accent); color: #fff; }
+.topbar { display: flex; gap: 6px; }
+.toggle, .topbar select { font: 12px "JetBrains Mono", monospace; background: var(--surface-1); color: var(--text-primary);
+  border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; cursor: pointer; }
+
+/* hero (no picture on these pages) */
+.hero { position: relative; overflow: hidden; background: #0c0c0b; color: var(--hero-ink); }
+.hero .scan { position: absolute; inset: 0; background:
+  linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px) 0 0 / 100% 32px,
+  linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px) 0 0 / 32px 100%,
+  linear-gradient(180deg, rgba(12,12,11,.2), rgba(12,12,11,.92)); }
+.hero .wrap { position: relative; padding-top: 48px; padding-bottom: 36px; }
+.tag { display: inline-block; font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .08em; text-transform: uppercase;
+  padding: 6px 8px; border: 1px solid rgba(255,255,255,.25); border-radius: 4px; color: #c3c2b7; }
+.hero h1 { font-size: clamp(30px, 6vw, 52px); line-height: 1.08; margin: 18px 0 12px; letter-spacing: -.02em; }
+.hero p.lede { max-width: 680px; color: #d6d5cd; font-size: 18px; margin: 0; }
+
+/* sections */
+section { padding: 48px 0 8px; }
+.eyebrow { font: 600 12px/1 "JetBrains Mono", monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+h2 { font-size: clamp(24px, 4vw, 32px); line-height: 1.15; margin: 10px 0 14px; letter-spacing: -.01em; scroll-margin-top: 12px; }
+h3 { font-size: 18px; margin: 22px 0 4px; scroll-margin-top: 12px; }
+p, li { color: var(--text-secondary); }
+p { max-width: 720px; }
+ul, ol { max-width: 720px; padding-left: 22px; }
+.card { background: var(--surface-1); border: 1px solid var(--line); border-radius: 10px; padding: 18px; margin: 18px 0; }
+.card h3 { margin-top: 0; }
+.note { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+.ph { font-family: "JetBrains Mono", monospace; font-size: .88em; color: var(--s2); background: var(--surface-2); border: 1px dashed var(--s2); border-radius: 4px; padding: 0 5px; white-space: normal; }
+.chk { font-family: "JetBrains Mono", monospace; font-size: .85em; color: var(--s4); font-weight: 600; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 820px) { .cols { grid-template-columns: 1fr; } }
+
+/* tables scroll inside their own box */
+.tablebox { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-1); margin: 14px 0; }
+.tablebox table { border-collapse: collapse; width: 100%; min-width: 560px; font: 14px/1.5 Inter, system-ui, sans-serif; }
+.tablebox th, .tablebox td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--grid); color: var(--text-secondary); }
+.tablebox th { color: var(--text-primary); background: var(--surface-2); font-weight: 600; }
+.tablebox tr:last-child td { border-bottom: 0; }
+.tablebox td:first-child { color: var(--text-primary); font-weight: 600; }
+.tablebox.keys td:first-child { font: 500 13px/1.5 "JetBrains Mono", monospace; overflow-wrap: anywhere; }
+
+figure.diagram { margin: 20px 0; padding: 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-1); }
+figure.diagram figcaption { margin-top: 10px; font-size: 14px; color: var(--text-secondary); }
+svg { display: block; width: 100%; height: auto; }
+svg text { font-family: Inter, system-ui, sans-serif; fill: var(--text-primary); font-size: 13px; }
+svg .sub { fill: var(--text-secondary); font-size: 12px; }
+
+/* status list */
+.status { list-style: none; padding: 0; max-width: 720px; }
+.status li { display: flex; gap: 10px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--grid); }
+.badge { flex: none; font: 600 11px/1 "JetBrains Mono", monospace; letter-spacing: .05em; text-transform: uppercase; padding: 5px 7px; border-radius: 4px; color: #fff; min-width: 96px; text-align: center; }
+.b-done { background: var(--s3); } .b-prog { background: var(--s4); } .b-plan { background: var(--text-muted); }
+details.faq { border-bottom: 1px solid var(--grid); padding: 10px 0; max-width: 720px; }
+details.faq summary { cursor: pointer; color: var(--text-primary); font-weight: 600; }
+details.faq p { margin: 8px 0 0; }
+footer { padding: 48px 0 72px; color: var(--text-muted); font-size: 14px; }
+.docs { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 32px; align-items: start; padding-top: 8px; }
+.toc { position: sticky; top: 12px; padding-top: 40px; max-height: 100vh; overflow-y: auto; }
+.toc .eyebrow { margin-bottom: 8px; }
+.toc ul { list-style: none; padding: 0; margin: 0; }
+.toc li { margin: 0; }
+.toc a { display: block; padding: 6px 10px; border-left: 2px solid var(--line); text-decoration: none; color: var(--text-secondary); font-size: 14px; }
+.toc a:hover { border-left-color: var(--accent); color: var(--text-primary); }
+.docs section { padding-top: 40px; }
+.docs section:first-child { padding-top: 40px; }
+@media (max-width: 820px) {
+  .docs { grid-template-columns: 1fr; gap: 0; }
+  .toc { position: static; max-height: none; padding-top: 24px; }
+  .toc ul { display: flex; flex-wrap: wrap; gap: 6px; }
+  .toc a { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+}
+.steps li { margin: 4px 0; }
+@media (max-width: 600px) {
+  .site .nav { order: 3; width: 100%; flex-wrap: nowrap; }
+  .site .nav a { flex: 1 1 0; text-align: center; padding: 9px 4px; font-size: 12px; }
+}
+.footlinks { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 14px; }
+.footlinks a { font: 500 13px/1.4 "JetBrains Mono", monospace; color: var(--text-secondary); }
+.pagetoc { padding-top: 18px; padding-bottom: 0; }
+.pagetoc .eyebrow { margin-bottom: 8px; }
+.pagetoc ul { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0; max-width: none; }
+.pagetoc a { display: block; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; text-decoration: none; color: var(--text-secondary); font-size: 14px; background: var(--surface-1); }
+.pagetoc a:hover { border-color: var(--accent); color: var(--text-primary); }
+</style>
+<script src="i18n.js"></script>
+</head>
+<body>
+<div class="site"><div class="wrap">
+  <nav class="nav" aria-label="Site">
+    <a href="index.html" data-i18n="nav_how">How it works</a>
+    <a href="x64.html" data-i18n="nav_x64">64-bit</a>
+    <a href="docs.html" aria-current="page" data-i18n="nav_docs">Documentation</a>
+  </nav>
+  <div class="topbar">
+    <select id="langSel" aria-label="Language">
+      <option value="en">English</option><option value="ru">Русский</option><option value="es">Español</option><option value="de">Deutsch</option><option value="zh">中文</option>
+    </select>
+    <button class="toggle" id="themeToggle" type="button" aria-label="Switch light / dark theme">theme</button>
+  </div>
+</div></div>
+
+<header class="hero">
+  <div class="scan"></div>
+  <div class="wrap">
+    <h1 data-i18n="doc_h1">Documentation</h1>
+    <p class="lede" data-i18n="doc_lede">Reference for the <a href="index.html">32-bit patch</a> (Memory Optimizer Patch, version 1.0.7) and its launcher (version 1.0.31), for <em>Men of War: Assault Squad 2</em> v3.262. The <a href="#x64">64-bit build</a> has its own section.</p>
+  </div>
+</header>
+
+<div class="wrap docs">
+
+<nav class="toc" aria-label="Contents">
+  <div class="eyebrow" data-i18n="doc_toc">Contents</div>
+  <ul>
+    <li><a href="#install" data-i18n="doc_toc_install">Install and uninstall</a></li>
+    <li><a href="#x64" data-i18n="doc_toc_x64">64-bit build</a></li>
+    <li><a href="#channels" data-i18n="doc_toc_channels">Update channels</a></li>
+    <li><a href="#launcher" data-i18n="doc_toc_launcher">The launcher window</a></li>
+    <li><a href="#settings" data-i18n="doc_toc_settings">Settings</a></li>
+    <li><a href="#mp" data-i18n="doc_toc_mp">Multiplayer</a></li>
+    <li><a href="#reports" data-i18n="doc_toc_reports">Crash and out-of-sync reports</a></li>
+    <li><a href="#trouble" data-i18n="doc_toc_trouble">Troubleshooting</a></li>
+    <li><a href="#faq" data-i18n="doc_toc_faq">FAQ</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<section id="install">
+  <div class="eyebrow">1</div>
+  <h2 data-i18n="doc_install_h">Install and uninstall</h2>
+
+  <h3 data-i18n="doc_inst_l_h">With the launcher (recommended)</h3>
+  <ol class="steps">
+    <li data-i18n="doc_inst_1">Close the game.</li>
+    <li data-i18n="doc_inst_2">Download the launcher zip from the <a href="https://github.com/GEM-Fixes/MOWAS2-Memory-Fixes/releases">releases page on GitHub</a>.</li>
+    <li data-i18n="doc_inst_3">Unzip it. (Right-click it, then choose <b>Extract All</b>.)</li>
+    <li data-i18n="doc_inst_4">Open the new folder and double-click <b>MoWAS2-Launcher</b>.</li>
+    <li data-i18n="doc_inst_5">Click <b>Yes</b>, then click <b>Play</b>.</li>
+  </ol>
+  <p data-i18n="doc_inst_p1">The game starts with the patch. Next time, double-click the <b>MoWAS2 Memory Fix</b> icon on your desktop and click <b>Play</b>. Always start the game with the launcher.</p>
+  <p data-i18n="doc_inst_win">If Windows shows a warning: it does not know the program yet. Click <b>More info</b>, then <b>Run anyway</b>.</p>
+
+  <h3 data-i18n="doc_inst_m_h">Without the launcher</h3>
+  <ol class="steps">
+    <li data-i18n="doc_man_1">Close the game and unzip the download. You only need the file <code>xvidcore.dll</code>.</li>
+    <li data-i18n="doc_man_2">Open the game folder, the one that contains <code>mowas_2.exe</code>. On Steam: right-click the game, then <b>Manage</b> &gt; <b>Browse local files</b>. For GOG or other copies, open the folder you installed the game into.</li>
+    <li data-i18n="doc_man_3">Rename the game's own <code>xvidcore.dll</code> to <code>xvidcore_orig.dll</code>. The patch needs this file: do not delete it.</li>
+    <li data-i18n="doc_man_4">Copy the new <code>xvidcore.dll</code> into the game folder and start the game as usual.</li>
+  </ol>
+  <p data-i18n="doc_man_upd">To update by hand: copy only the new <code>xvidcore.dll</code> over the old one. Do not rename anything again. After a manual install you are responsible for updates and for sending crash reports yourself.</p>
+
+  <h3 data-i18n="doc_un_h">Uninstall</h3>
+  <ul>
+    <li data-i18n="doc_un_1">Launcher: if the 64-bit build is installed, click <b>Uninstall 64-bit</b>. Then open <b>Tools</b>, click <b>Remove the fix</b>, then <b>Uninstall launcher</b> (also in <b>Tools</b>). The game is back to how it was.</li>
+    <li data-i18n="doc_un_2">By hand: delete <code>xvidcore.dll</code>, then rename <code>xvidcore_orig.dll</code> back to <code>xvidcore.dll</code>.</li>
+    <li data-i18n="doc_un_3">On Steam, <b>Properties</b> &gt; <b>Installed Files</b> &gt; <b>Verify integrity of game files</b> also restores the original file.</li>
+  </ul>
+  <p class="note" data-i18n="doc_files_note">The patch does not change any game files. It keeps a few small files of its own in a <code>memhook</code> folder inside the game folder. You can delete them at any time; they are made again.</p>
+</section>
+
+<section id="x64">
+  <h2 data-i18n="doc_x64_h">64-bit build</h2>
+  <p data-i18n="doc_x64_p1">The <a href="x64.html#what">64-bit build</a> (version 1.0.0) is a separate game program that runs the same game files and mods without the 4 GB memory limit. It has the same turbo mode as the 32-bit patch. You get it only through the launcher: it is not on GitHub and there is no separate download. See the <a href="x64.html">64-bit page</a> for what it is and how it differs from the patch.</p>
+  <h3 data-i18n="doc_x64_own_h">What you need</h3>
+  <p data-i18n="doc_x64_own"><b>You need the original game.</b> The 64-bit build only starts when all of this is true:</p>
+  <ul>
+    <li data-i18n="doc_x64_own1">it sits in the game's Steam folder next to the Steam <code>mowas_2.exe</code> and the game's files;</li>
+    <li data-i18n="doc_x64_own2">Steam is running;</li>
+    <li data-i18n="doc_x64_own3">the game's Steam file is Valve's original;</li>
+    <li data-i18n="doc_x64_own4">your Steam account owns <a href="https://store.steampowered.com/app/244450/"><em>Men of War: Assault Squad 2</em></a> and has it installed.</li>
+  </ul>
+  <p data-i18n="doc_x64_own5">Otherwise it shows a message and closes, for example "Start Steam first: ..." or "This Steam account does not own Men of War: Assault Squad 2 (or it is not installed). The 64-bit build only runs together with your own copy of the game." The launcher installs it only into a Steam installation of the game.</p>
+  <h3 data-i18n="doc_x64_i_h">Install</h3>
+  <ol class="steps">
+    <li data-i18n="doc_x64_i1">Open the launcher (<code>MoWAS2-Launcher.exe</code>). The <b>Game to start</b> box has two choices: <b>32-bit game with the fix</b> and <b>64-bit build</b>, each with its version.</li>
+    <li data-i18n="doc_x64_i2">Click <b>Install 64-bit</b> next to it. The launcher downloads the 64-bit build, checks it against the signed update list, places it in the game folder next to <code>mowas_2.exe</code> and selects it.</li>
+    <li data-i18n="doc_x64_i3">Click <b>Play (64-bit)</b>.</li>
+  </ol>
+  <h3 data-i18n="doc_x64_u_h">Uninstall</h3>
+  <p data-i18n="doc_x64_u">Click <b>Uninstall 64-bit</b>. This removes only the 64-bit build. The <a href="index.html">32-bit patch</a> and your game files are not touched.</p>
+  <h3 data-i18n="doc_x64_s_h">Switching between 32-bit and 64-bit</h3>
+  <p data-i18n="doc_x64_s">Both can stay installed. Choose one in <b>Game to start</b>. The <b>Play</b> button shows which one it starts: <b>Play (32-bit)</b> or <b>Play (64-bit)</b>.</p>
+  <h3 data-i18n="doc_x64_m_h">Multiplayer</h3>
+  <p data-i18n="doc_x64_m">The 64-bit build is compatible with unpatched versions of the game: 64-bit players can play multiplayer with players of the <a href="index.html">32-bit patch</a> and with players who run the normal, unpatched game. Turbo mode is only on when everyone in the match has it. See <a href="#mp">Multiplayer compatibility</a>.</p>
+  <h3 data-i18n="doc_x64_w_h">32-bit patch or 64-bit build?</h3>
+  <p data-i18n="doc_x64_w">Both fix the memory crashes: the patch keeps unused data outside the 4 GB, the 64-bit build has no 4 GB limit. With the patch we know of no mod that cannot be played. Both have the same speed fixes and the same turbo mode 1.0.0. 64-bit alone does not make battles faster. More on the <a href="x64.html#speed">64-bit page</a>.</p>
+  <h3 data-i18n="doc_x64_ini_h">Settings</h3>
+  <p data-i18n="doc_x64_ini">The <code>memhook.ini</code> settings belong to the <a href="index.html">32-bit patch</a> and do not apply to the 64-bit build. Most of them move data around inside the 4 GB, which the 64-bit build does not need.</p>
+</section>
+
+<section id="channels">
+  <div class="eyebrow">2</div>
+  <h2 data-i18n="doc_ch_h">Update channels</h2>
+  <p data-i18n="doc_ch_p1">With the launcher you do not need to do anything to update: click <b>Play</b> and you get the newest version of your channel.</p>
+  <div class="tablebox"><table>
+    <thead><tr><th data-i18n="doc_ch_t0">Channel</th><th data-i18n="doc_ch_t1">Version</th><th data-i18n="doc_ch_t2">What it is</th></tr></thead>
+    <tbody>
+      <tr><td data-i18n="doc_ch_r1a">Stable</td><td>1.0.7-rev2</td><td data-i18n="doc_ch_r1c">The normal version, stable since 18 November 2026. Memory fixes, faster loading, a faster simulation with exactly the same results as the unmodified game, and turbo mode 1.0.0 for multiplayer matches in which every player has it.</td></tr>
+      <tr><td data-i18n="doc_ch_r2a">Pre-release</td><td data-i18n="doc_ch_r2b">test versions</td><td data-i18n="doc_ch_r2c">Test versions of the next update, before they become stable.</td></tr>
+    </tbody>
+  </table></div>
+  <p data-i18n="doc_ch_p2">To change the channel, pick <b>Stable version</b> or the pre-release in the channel box next to the updates line, then click <b>Check for updates</b>. To go back, pick <b>Stable version</b> again. The 64-bit build has its own version (1.0.0); the launcher keeps it up to date as well.</p>
+</section>
+
+<section id="launcher">
+  <div class="eyebrow">3</div>
+  <h2 data-i18n="doc_l_h">The launcher window</h2>
+  <p data-i18n="doc_l_p">The launcher (version 1.0.31) is called "Men of War: Assault Squad 2 - Memory Fix". From top to bottom it shows:</p>
+  <ul>
+    <li data-i18n="doc_l_1"><b>Game folder</b>: the game the launcher works on.</li>
+    <li data-i18n="doc_l_2"><b>Game to start</b>: <b>32-bit game with the fix</b> or <b>64-bit build</b>, each with its version, and the <b>Install 64-bit</b> button (<b>Uninstall 64-bit</b> once it is installed).</li>
+    <li data-i18n="doc_l_3"><b>Updates</b>: the update status, the channel box (<b>Stable version</b> or pre-release) and <b>Check for updates</b>.</li>
+    <li data-i18n="doc_l_4"><b>Play</b>: the big button. It says which game it starts, for example <b>Play (32-bit)</b> or <b>Play (64-bit)</b>.</li>
+    <li data-i18n="doc_l_5"><b>Tools</b>: a menu with the things you rarely need, such as the game folder, installing or repairing the fix, <b>Remove the fix</b>, crash reports, the project page and <b>Uninstall launcher</b>.</li>
+    <li data-i18n="doc_l_6">A log of what the launcher is doing, a <b>Send feedback</b> box for a short message to the developers, a language box (English, Русский, Español, Deutsch, 中文), and the buttons <b>Join Discord</b> and <b>Support on Ko-fi</b>.</li>
+  </ul>
+</section>
+
+
+<section id="settings">
+  <div class="eyebrow">4</div>
+  <h2 data-i18n="doc_set_h">Settings</h2>
+  <p data-i18n="doc_set_p1">The patch needs no settings file. Everything is on by default. To switch a single feature off, create a text file called <code>memhook.ini</code> in the game folder (next to <code>mowas_2.exe</code>). Put the line <code>[memhook]</code> in it, and below it the feature with <code>=0</code>. Only change these if asked.</p>
+  <div class="card"><pre class="mono" style="margin:0;font-size:13px;overflow-x:auto">[memhook]
+pakalias=0</pre></div>
+  <p class="note" data-i18n="doc_set_p2">This example switches off the sharing of duplicate files.</p>
+
+  <h3 data-i18n="doc_set_k_h">Main keys</h3>
+  <div class="tablebox keys"><table>
+    <thead><tr><th data-i18n="doc_k0">Key</th><th data-i18n="doc_k1">What it controls</th></tr></thead>
+    <tbody>
+      <tr><td>surfvault</td><td data-i18n="doc_k_surfvault">Textures kept outside the 4 GB.</td></tr>
+      <tr><td>hwvault</td><td data-i18n="doc_k_hwvault">Model data kept outside the 4 GB.</td></tr>
+      <tr><td>sndvault</td><td data-i18n="doc_k_sndvault">Sounds kept outside the 4 GB.</td></tr>
+      <tr><td>animvault</td><td data-i18n="doc_k_animvault">Animation data kept outside the 4 GB.</td></tr>
+      <tr><td>slab</td><td data-i18n="doc_k_slab">Small memory blocks stored tightly.</td></tr>
+      <tr><td>roundtrap</td><td data-i18n="doc_k_roundtrap">Map leak cleanup between battles.</td></tr>
+      <tr><td>pakalias</td><td data-i18n="doc_k_pakalias">Shared duplicate files.</td></tr>
+      <tr><td>zone_mb</td><td data-i18n="doc_k_zone">Reserve for big memory requests. <code>zone_mb=0</code> switches it off.</td></tr>
+      <tr><td>no_preload_cache</td><td data-i18n="doc_k_nopreload">The definition file cache.</td></tr>
+      <tr><td>fast_sim</td><td data-i18n="doc_k_fastsim">Faster simulation.</td></tr>
+      <tr><td>stream_vault</td><td data-i18n="doc_k_stream">Music outside the 4 GB.</td></tr>
+      <tr><td>lean_index</td><td data-i18n="doc_k_lean">Smaller list of the game's files.</td></tr>
+      <tr><td>tag_slim</td><td data-i18n="doc_k_tag">Smaller interaction rules.</td></tr>
+      <tr><td>lazy_rules</td><td data-i18n="doc_k_lazy">Interaction rules read when a map loads, not at start.</td></tr>
+      <tr><td>ui_scale_option</td><td data-i18n="doc_k_ui">The "UI scale" row in Options &gt; Video and everything behind it.</td></tr>
+      <tr><td>zip_cache</td><td data-i18n="doc_k_zip">Archive read cache.</td></tr>
+      <tr><td>mount_once</td><td data-i18n="doc_k_mount">The base game is mounted once at start.</td></tr>
+      <tr><td>no_splash_wait</td><td data-i18n="doc_k_splash">No 5-second splash wait.</td></tr>
+      <tr><td>fast_tga</td><td data-i18n="doc_k_tga">Faster image decoder.</td></tr>
+      <tr><td>group_buffers</td><td data-i18n="doc_k_group">Static map geometry created once.</td></tr>
+      <tr><td>oos_log</td><td data-i18n="doc_k_oos">Out-of-sync reports written to <code>log\oos</code>.</td></tr>
+      <tr><td>fps_limit</td><td data-i18n="doc_k_fps">Frame limit with vertical sync off. <code>fps_limit=N</code> sets another limit (for example 144), <code>-1</code> removes the limit completely (a CPU core then runs flat out, even in the menus), <code>0</code> leaves the game's own behaviour.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 data-i18n="doc_set_d_h">More keys, from the debug package settings file</h3>
+  <p data-i18n="doc_set_d_p">The debug package's <code>memhook.ini</code> lists more keys, with a one-line comment each.</p>
+  <div class="tablebox keys"><table>
+    <thead><tr><th data-i18n="doc_k0b">Key</th><th data-i18n="doc_k1b">What it controls</th></tr></thead>
+    <tbody>
+      <tr><td>load_cache</td><td data-i18n="doc_d_loadcache">Faster start and faster entry into multiplayer: remembers checksums of resource files between runs.</td></tr>
+      <tr><td>fast_handoff</td><td data-i18n="doc_d_handoff">Faster map loading: texture loader hand-offs.</td></tr>
+      <tr><td>fast_lex</td><td data-i18n="doc_d_lex">Faster reading of the game's text files.</td></tr>
+      <tr><td>fast_zip</td><td data-i18n="doc_d_fastzip">Faster reading of uncompressed archive entries and faster archive checksums.</td></tr>
+      <tr><td>load_evict</td><td data-i18n="doc_d_loadevict">While a map loads, idle data is moved out of the 4 GB about once a second.</td></tr>
+      <tr><td>par_workers</td><td data-i18n="doc_d_par">Helper threads for the parts that can run on several cores. -1 = one per extra logical core, 0 = off.</td></tr>
+      <tr><td>sync_slim</td><td data-i18n="doc_d_syncslim">Multiplayer: no per-second sync snapshots and no huge out-of-sync report. The sync check itself is unchanged. Set to 0 to get the game's full report in <code>log\oos</code>.</td></tr>
+      <tr><td>dynamic_delay, dynamic_delay_min</td><td data-i18n="doc_d_dyn">Multiplayer host: the minimum batch of simulation time (the game's own value is 100 ms). Only the host's setting counts. 0 = the game's own 100 ms.</td></tr>
+      <tr><td>watch_fix</td><td data-i18n="doc_d_watch">Spectators: switching the watched player no longer causes an out-of-sync on that PC. 0 = the game's own behaviour.</td></tr>
+      <tr><td>fs_borderless</td><td data-i18n="doc_d_fs">Fullscreen without display mode switches: a borderless window covering the monitor, so alt-tab works without resolution changes. 0 = the game's own exclusive fullscreen.</td></tr>
+      <tr><td>render_scale</td><td data-i18n="doc_d_rs">Fullscreen at a resolution below the monitor's: the 3D picture is drawn at the chosen resolution and enlarged, the interface is drawn at the monitor's own pixels. -1 automatic, 1 always, 0 off.</td></tr>
+      <tr><td>dof_off</td><td data-i18n="doc_d_dof">The High / Ultra presets no longer switch depth of field on. Ticking it in Options &gt; Video still turns it on. 0 = the game's own behaviour.</td></tr>
+      <tr><td>ui_scale</td><td data-i18n="doc_d_uiscale">Factor in percent used when the profile has no value yet (100 = off).</td></tr>
+      <tr><td>interval_ms, frame_log, hitch_prof</td><td data-i18n="doc_d_diag">Logging and diagnostics for the debug build. Leave as they are unless asked.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="mp">
+  <div class="eyebrow">5</div>
+  <h2 data-i18n="doc_mp_h">Multiplayer compatibility</h2>
+  <ul>
+    <li data-i18n="doc_mp_1"><b>Compatible with the unpatched game.</b> Players with the <a href="index.html">32-bit patch</a> or the <a href="#x64">64-bit build</a> can play multiplayer together with players who run the normal, unpatched game. The match then plays in vanilla compatibility mode.</li>
+    <li data-i18n="doc_mp_4"><b>Turbo mode.</b> Turbo mode is on when every player in the match has a version with it: the <a href="index.html">32-bit patch</a> 1.0.7-rev2 or the 64-bit build 1.0.0. They play turbo together, whoever hosts. Otherwise the match plays in vanilla compatibility mode, automatically. A player still on 1.0.7-rev1 needs the update (the launcher updates automatically).</li>
+    <li data-i18n="doc_mp_5"><b>Before the start.</b> Stay in the lobby for about 15 seconds before the host starts the match.</li>
+    <li data-i18n="doc_mp_2"><b>Chat line.</b> When the match is on screen, the chat tells you the mode, for example "Memory Optimizer Patch: everyone in this match runs turbo mode 1.0.0 - turbo mode is on." (64-bit players see "64-bit build: ..."). Otherwise it says that the match is running in vanilla compatibility mode.</li>
+  </ul>
+  <p data-i18n="doc_mp_p">For the 64-bit build, see the <a href="#x64">64-bit build</a> section and the <a href="x64.html#mp">64-bit page</a>.</p>
+</section>
+
+<section id="reports">
+  <div class="eyebrow">6</div>
+  <h2 data-i18n="doc_rep_h">Crash and out-of-sync reports</h2>
+  <h3 data-i18n="doc_rep_l_h">What the launcher sends</h3>
+  <ul>
+    <li data-i18n="doc_rep_1">An anonymous usage count once a day.</li>
+    <li data-i18n="doc_rep_2">Out-of-sync reports and crash records, automatically.</li>
+    <li data-i18n="doc_rep_3">Replays of finished matches for AI training, with player names and Steam IDs removed.</li>
+  </ul>
+  <p data-i18n="doc_rep_p1">You can turn each of them off: click <b>Settings...</b> next to the language box and untick its box.</p>
+  <p data-i18n="doc_rep_p2">If something goes wrong, open <b>Tools</b> in the launcher and click <b>Send report</b>. That sends the crash files to the developer. You can also write a short message in the <b>Send feedback</b> box.</p>
+  <h3 data-i18n="doc_rep_f_h">Where the files are</h3>
+  <p data-i18n="doc_rep_p3">Crash files are in <code>Documents\My Games\men of war - assault squad 2\log</code> (folders <code>minidumps</code> and <code>oos</code>). When a match goes out of sync, the patch writes a full report of the match state to <code>log\oos\full &lt;date time&gt; q... p....txt</code>. Every player with the patch gets their own file. The host's file and an out-of-sync player's file are the most useful pair.</p>
+  <p data-i18n="doc_rep_p4">Without the launcher, send the file zipped together with <code>game.log</code> (in the <code>log</code> folder), and say which mods you run and on which map it happened.</p>
+</section>
+
+<section id="trouble">
+  <div class="eyebrow">7</div>
+  <h2 data-i18n="doc_tr_h">Troubleshooting</h2>
+  <p data-i18n="doc_tr_p0">Always include <code>game.log</code>, your mod list and the map when you report a problem.</p>
+
+  <h3 data-i18n="doc_tr_oom_h">Out of memory: "Failed to allocate memory ... (eMemory.cpp, 94)"</h3>
+  <p data-i18n="doc_tr_oom">The game has run out of its 4 GB. This is what the patch is for. Check that the patch is installed (the patch version is shown in the crash dialog and in the menu), update to the newest version, and close other programs. If it still happens, send the crash files and say which mods you run. The game's memory use depends on the mod and the map. The <a href="#x64">64-bit build</a> has no 4 GB limit.</p>
+
+  <h3 data-i18n="doc_tr_script_h">A mod's script failed</h3>
+  <p data-i18n="doc_tr_script">The mod is broken or does not fit your game version or the other mods you have active. Switch off mods you do not need, make sure the mod is up to date and was installed completely, and try again. The patch does not change mod scripts.</p>
+
+  <h3 data-i18n="doc_tr_file_h">A file is missing: "File not found - resource/..."</h3>
+  <p data-i18n="doc_tr_file">The game or a mod asks for a file that is not there. Reinstall or re-download the mod; on Steam, use <b>Verify integrity of game files</b>. If the error appears only with the patch, send the report: the patch shares identical files between a mod's archives, and a mistake there can look like this.</p>
+
+  <h3 data-i18n="doc_tr_gfx_h">The graphics card stopped working, or the screen mode is wrong</h3>
+  <p data-i18n="doc_tr_gfx">Windows can reset the graphics driver, and then the game loses its graphics device and closes. Update your graphics driver and try windowed mode or a lower resolution. Changing the display resolution while a match is running can crash the game.</p>
+
+  <h3 data-i18n="doc_tr_od_h">"Failed to create memory mapped file (eSteamCloud.cpp, 203)" and OneDrive</h3>
+  <p data-i18n="doc_tr_od">The game could not write its profile copy into <code>Documents\My Games</code>. This is not caused by the patch. It is known to happen when the Documents folder is inside OneDrive. The patch adds a note to the crash dialog in that case. Try: set the <code>My Games</code> folder to "Always keep on this device", pause OneDrive, or stop OneDrive from backing up Documents. Also check for Controlled folder access, antivirus, read-only profile files, or a leftover game process.</p>
+
+  <h3 data-i18n="doc_tr_win_h">Windows shows a warning when starting the launcher</h3>
+  <p data-i18n="doc_tr_win">This is normal for a program Windows does not know yet. Click <b>More info</b>, then <b>Run anyway</b>.</p>
+</section>
+
+<section id="faq">
+  <div class="eyebrow">8</div>
+  <h2 data-i18n="doc_faq_h">FAQ</h2>
+  <details class="faq"><summary data-i18n="doc_q1">Does it work with all mods?</summary><p data-i18n="doc_a1">Yes, that is the aim. Problems with a particular mod are welcome as reports.</p></details>
+  <details class="faq"><summary data-i18n="doc_q2">Does it change my game files?</summary><p data-i18n="doc_a2">No. It is a single DLL that the game loads by itself. The only file it replaces is <code>xvidcore.dll</code>, and your original is kept as <code>xvidcore_orig.dll</code>.</p></details>
+  <details class="faq"><summary data-i18n="doc_q3">Can I play with people who do not have the patch?</summary><p data-i18n="doc_a3">Yes. See Multiplayer compatibility above.</p></details>
+  <details class="faq"><summary data-i18n="doc_q4">Do I have to use the launcher?</summary><p data-i18n="doc_a4">For the <a href="#x64">64-bit build</a>, yes: you get it only through the launcher. For the <a href="index.html">32-bit patch</a> it is recommended: it updates the patch and sends reports. Without it you update and report by hand.</p></details>
+  <details class="faq"><summary data-i18n="doc_q5">Is the game still 32-bit with the patch?</summary><p data-i18n="doc_a5">Yes. The patch works inside the 4 GB limit. A separate <a href="#x64">64-bit build</a> is available without this limit. Both fix the memory crashes.</p></details>
+  <details class="faq"><summary data-i18n="doc_q7">Will the 64-bit build make big battles faster?</summary><p data-i18n="doc_a7">64-bit alone does not. What makes big battles much faster is turbo mode (Style v1), which both the <a href="index.html#style">32-bit patch</a> and the 64-bit build have. It is used in multiplayer when every player in the match has it. See the <a href="x64.html#speed">64-bit page</a>.</p></details>
+  <details class="faq"><summary data-i18n="doc_q6">How do I switch a feature off?</summary><p data-i18n="doc_a6">Create <code>memhook.ini</code> as described under Settings.</p></details>
+</section>
+
+</main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="footlinks">
+      <a href="index.html" data-i18n="nav_how">How it works</a>
+      <a href="x64.html" data-i18n="nav_x64">64-bit</a>
+      <a href="docs.html" data-i18n="nav_docs">Documentation</a>
+      <a href="https://github.com/GEM-Fixes/MOWAS2-Memory-Fixes" data-i18n="nav_github">GitHub</a>
+    </div>
+    <p class="note" data-i18n="doc_foot">Author: Wyldstyle.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  I18N_apply();
+  const root = document.documentElement, btn = document.getElementById('themeToggle');
+  function cur() { return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
+  try { const t = localStorage.getItem('mo-theme'); if (t) root.dataset.theme = t; } catch (e) {}
+  btn.textContent = cur() === 'dark' ? T('light') : T('dark');
+  btn.addEventListener('click', () => {
+    root.dataset.theme = cur() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem('mo-theme', root.dataset.theme); } catch (e) {}
+    btn.textContent = cur() === 'dark' ? T('light') : T('dark');
+  });
+})();
+</script>
+</body>
+</html>

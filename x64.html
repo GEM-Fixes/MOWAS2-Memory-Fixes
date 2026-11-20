@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en" data-title-key="x64_title">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The 64-bit build</title>
+<meta name="description" content="A 64-bit version of Men of War: Assault Squad 2 that is compatible with the normal, unpatched game in multiplayer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f3ef; --surface-1: #fcfcfb; --surface-2: #ecebe6; --line: #d9d8d2; --grid: #e6e5df;
+  --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #7a7974; --accent: #2a78d6;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --free: #dcdbd5; --hero-ink: #f0efec;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --bg: #121211; --surface-1: #1a1a19; --surface-2: #232321; --line: #34332f; --grid: #2a2a27;
+    --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #8f8e86; --accent: #3987e5;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --free: #2e2e2b;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121211; --surface-1: #1a1a19; --surface-2: #232321; --line: #34332f; --grid: #2a2a27;
+  --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #8f8e86; --accent: #3987e5;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --free: #2e2e2b;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text-primary); font: 16px/1.6 Inter, system-ui, sans-serif; overflow-x: hidden; }
+.mono, code, .k { font-family: "JetBrains Mono", ui-monospace, monospace; }
+code { font-size: .9em; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+a { color: var(--accent); }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+/* top bar with nav */
+.site { background: var(--surface-1); border-bottom: 1px solid var(--line); }
+.site .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding-top: 10px; padding-bottom: 10px; }
+.nav { display: flex; flex-wrap: wrap; gap: 4px 6px; }
+.nav a { font: 500 13px/1 "JetBrains Mono", monospace; padding: 8px 10px; border-radius: 6px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; }
+.nav a:hover { border-color: var(--line); }
+.nav a[aria-current="page"] { background: var(--accent); color: #fff; }
+.topbar { display: flex; gap: 6px; }
+.toggle, .topbar select { font: 12px "JetBrains Mono", monospace; background: var(--surface-1); color: var(--text-primary);
+  border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; cursor: pointer; }
+
+/* hero (no picture on these pages) */
+.hero { position: relative; overflow: hidden; background: #0c0c0b; color: var(--hero-ink); }
+.hero .scan { position: absolute; inset: 0; background:
+  linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px) 0 0 / 100% 32px,
+  linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px) 0 0 / 32px 100%,
+  linear-gradient(180deg, rgba(12,12,11,.2), rgba(12,12,11,.92)); }
+.hero .wrap { position: relative; padding-top: 48px; padding-bottom: 36px; }
+.tag { display: inline-block; font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .08em; text-transform: uppercase;
+  padding: 6px 8px; border: 1px solid rgba(255,255,255,.25); border-radius: 4px; color: #c3c2b7; }
+.hero h1 { font-size: clamp(30px, 6vw, 52px); line-height: 1.08; margin: 18px 0 12px; letter-spacing: -.02em; }
+.hero p.lede { max-width: 680px; color: #d6d5cd; font-size: 18px; margin: 0; }
+
+/* sections */
+section { padding: 48px 0 8px; }
+.eyebrow { font: 600 12px/1 "JetBrains Mono", monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+h2 { font-size: clamp(24px, 4vw, 32px); line-height: 1.15; margin: 10px 0 14px; letter-spacing: -.01em; scroll-margin-top: 12px; }
+h3 { font-size: 18px; margin: 22px 0 4px; scroll-margin-top: 12px; }
+p, li { color: var(--text-secondary); }
+p { max-width: 720px; }
+ul, ol { max-width: 720px; padding-left: 22px; }
+.card { background: var(--surface-1); border: 1px solid var(--line); border-radius: 10px; padding: 18px; margin: 18px 0; }
+.card h3 { margin-top: 0; }
+.note { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+.ph { font-family: "JetBrains Mono", monospace; font-size: .88em; color: var(--s2); background: var(--surface-2); border: 1px dashed var(--s2); border-radius: 4px; padding: 0 5px; white-space: normal; }
+.chk { font-family: "JetBrains Mono", monospace; font-size: .85em; color: var(--s4); font-weight: 600; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 820px) { .cols { grid-template-columns: 1fr; } }
+
+/* tables scroll inside their own box */
+.tablebox { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-1); margin: 14px 0; }
+.tablebox table { border-collapse: collapse; width: 100%; min-width: 560px; font: 14px/1.5 Inter, system-ui, sans-serif; }
+.tablebox th, .tablebox td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--grid); color: var(--text-secondary); }
+.tablebox th { color: var(--text-primary); background: var(--surface-2); font-weight: 600; }
+.tablebox tr:last-child td { border-bottom: 0; }
+.tablebox td:first-child { color: var(--text-primary); font-weight: 600; }
+.tablebox.keys td:first-child { font: 500 13px/1.5 "JetBrains Mono", monospace; overflow-wrap: anywhere; }
+
+figure.diagram { margin: 20px 0; padding: 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-1); }
+figure.diagram figcaption { margin-top: 10px; font-size: 14px; color: var(--text-secondary); }
+svg { display: block; width: 100%; height: auto; }
+svg text { font-family: Inter, system-ui, sans-serif; fill: var(--text-primary); font-size: 13px; }
+svg .sub { fill: var(--text-secondary); font-size: 12px; }
+
+/* status list */
+.status { list-style: none; padding: 0; max-width: 720px; }
+.status li { display: flex; gap: 10px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--grid); }
+.badge { flex: none; font: 600 11px/1 "JetBrains Mono", monospace; letter-spacing: .05em; text-transform: uppercase; padding: 5px 7px; border-radius: 4px; color: #fff; min-width: 96px; text-align: center; }
+.b-done { background: var(--s3); } .b-prog { background: var(--s4); } .b-plan { background: var(--text-muted); }
+details.faq { border-bottom: 1px solid var(--grid); padding: 10px 0; max-width: 720px; }
+details.faq summary { cursor: pointer; color: var(--text-primary); font-weight: 600; }
+details.faq p { margin: 8px 0 0; }
+footer { padding: 48px 0 72px; color: var(--text-muted); font-size: 14px; }
+@media (max-width: 600px) {
+  .site .nav { order: 3; width: 100%; flex-wrap: nowrap; }
+  .site .nav a { flex: 1 1 0; text-align: center; padding: 9px 4px; font-size: 12px; }
+}
+.footlinks { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 14px; }
+.footlinks a { font: 500 13px/1.4 "JetBrains Mono", monospace; color: var(--text-secondary); }
+.pagetoc { padding-top: 18px; padding-bottom: 0; }
+.pagetoc .eyebrow { margin-bottom: 8px; }
+.pagetoc ul { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0; max-width: none; }
+.pagetoc a { display: block; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; text-decoration: none; color: var(--text-secondary); font-size: 14px; background: var(--surface-1); }
+.pagetoc a:hover { border-color: var(--accent); color: var(--text-primary); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--text-secondary); margin: 4px 0 10px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+svg .ax { fill: var(--text-muted); font-size: 11px; }
+svg .lbl { fill: var(--text-primary); font-size: 12px; font-weight: 600; }
+svg .lbl2 { fill: var(--text-secondary); font-size: 11px; }
+</style>
+<script src="i18n.js"></script>
+</head>
+<body>
+<div class="site"><div class="wrap">
+  <nav class="nav" aria-label="Site">
+    <a href="index.html" data-i18n="nav_how">How it works</a>
+    <a href="x64.html" aria-current="page" data-i18n="nav_x64">64-bit</a>
+    <a href="docs.html" data-i18n="nav_docs">Documentation</a>
+  </nav>
+  <div class="topbar">
+    <select id="langSel" aria-label="Language">
+      <option value="en">English</option><option value="ru">Русский</option><option value="es">Español</option><option value="de">Deutsch</option><option value="zh">中文</option>
+    </select>
+    <button class="toggle" id="themeToggle" type="button" aria-label="Switch light / dark theme">theme</button>
+  </div>
+</div></div>
+
+<header class="hero">
+  <div class="scan"></div>
+  <div class="wrap">
+    <h1 data-i18n="x64_h1">The 64-bit build</h1>
+    <p class="lede" data-i18n="x64_lede">A 64-bit version of <em>Men of War: Assault Squad 2</em> (game version 3.262). Version 1.0.0. It has no 4 GB memory limit, it is compatible with the normal, unpatched game in multiplayer, and it has the same turbo mode as the <a href="index.html">32-bit patch</a>. You get it through the launcher. <b>It only works if you own <a href="https://store.steampowered.com/app/244450/">the game on Steam</a>.</b></p>
+  </div>
+</header>
+
+<nav class="pagetoc wrap" aria-label="On this page">
+  <div class="eyebrow" data-i18n="x64_toc">On this page</div>
+  <ul>
+    <li><a href="#what" data-i18n="x64_toc_what">What it is</a></li>
+    <li><a href="#ram" data-i18n="x64_toc_ram">Did the game need 64-bit?</a></li>
+    <li><a href="#speed" data-i18n="x64_toc_speed">Speed and turbo mode</a></li>
+    <li><a href="#install" data-i18n="x64_toc_install">Install and uninstall</a></li>
+    <li><a href="#diff" data-i18n="x64_toc_diff">Compared with the patch</a></li>
+    <li><a href="#mp" data-i18n="x64_toc_mp">Playing with others</a></li>
+    <li><a href="#mods" data-i18n="x64_toc_mods">Mods</a></li>
+    <li><a href="#status" data-i18n="x64_toc_status">What's included</a></li>
+    <li><a href="#faq" data-i18n="x64_toc_faq">Questions</a></li>
+  </ul>
+</nav>
+
+<main class="wrap">
+
+<section id="what">
+  <div class="eyebrow" data-i18n="x64_ey_what">What it is</div>
+  <h2 data-i18n="x64_what_h">A 64-bit version of the game</h2>
+  <p data-i18n="x64_what_p1">The original game is a 32-bit program. It can only use 4 GB of memory, however much memory your PC has. Big mods use most of those 4 GB, and the game crashes when they run out.</p>
+  <p data-i18n="x64_what_p2">The 64-bit build is a new game program, built from a source-code reconstruction of the game. It does not patch the original 32-bit program. A 64-bit program has no 4 GB ceiling, so the memory limit is gone.</p>
+  <p data-i18n="x64_what_p3">It uses the same game files and the same mods. You need <a href="https://store.steampowered.com/app/244450/">your own Steam copy</a> of the game (see "Install and uninstall").</p>
+
+  <figure class="diagram">
+    <svg viewBox="0 0 700 215" role="img" data-i18n-aria="x64_svg_aria" aria-label="Drawing: a 32-bit game has one box of 4 GB with game, data and free space. A 64-bit game has a much larger space.">
+      <text x="0" y="16" data-i18n="x64_svg_32">32-bit game: 4 GB in total</text>
+      <rect x="0" y="26" width="120" height="44" rx="6" fill="var(--s1)"/>
+      <rect x="120" y="26" width="150" height="44" fill="var(--s2)"/>
+      <rect x="270" y="26" width="30" height="44" fill="var(--free)"/>
+      <rect x="0.5" y="26.5" width="299" height="43" rx="6" fill="none" stroke="var(--text-muted)"/>
+      <text x="8" y="53" style="fill:#fff" data-i18n="x64_svg_game">game</text>
+      <text x="128" y="53" style="fill:#fff" data-i18n="x64_svg_data">data (mods, textures, models)</text>
+      <text x="0" y="90" class="sub" data-i18n="x64_svg_free32">almost no free space with a big mod</text>
+      <text x="0" y="132" data-i18n="x64_svg_64">64-bit build: no 4 GB limit</text>
+      <rect x="0" y="142" width="120" height="44" rx="6" fill="var(--s1)"/>
+      <rect x="120" y="142" width="150" height="44" fill="var(--s2)"/>
+      <rect x="270" y="142" width="430" height="44" fill="var(--free)"/>
+      <line x1="300" y1="134" x2="300" y2="194" stroke="var(--text-muted)" stroke-dasharray="4 3"/>
+      <text x="304" y="206" class="sub" data-i18n="x64_svg_4gb">the old 4 GB line</text>
+      <text x="320" y="169" class="sub" data-i18n="x64_svg_room">room to grow, up to your PC's memory</text>
+    </svg>
+    <figcaption data-i18n="x64_svg_cap">Schematic drawing, not to scale and not measured.</figcaption>
+  </figure>
+</section>
+
+<section id="ram">
+  <div class="eyebrow" data-i18n="x64_ey_ram">The memory problem</div>
+  <h2 data-i18n="x64_ram_h">Did the game need 64-bit?</h2>
+  <p data-i18n="x64_ram_p1">For years the community said the same thing: big mods crash with "Failed to allocate memory", and the only real fix would be a 64-bit version of the game. The crash is real and the cause is right: a 32-bit program can only use 4 GB of memory, and big mods fill it.</p>
+  <p data-i18n="x64_ram_p2">But 64-bit is not the only way out. The <a href="index.html#vaults">32-bit patch</a> keeps the game inside its 4 GB: it moves data the game is not using right now (textures, models, sounds, animations) out of those 4 GB, into your PC's normal memory, and brings it back when the game needs it. It also stops memory from piling up from one match to the next. With the patch, we know of no mod that cannot be played.</p>
+  <p data-i18n="x64_ram_p3">The <a href="#what">64-bit build</a> removes the 4 GB ceiling itself, so none of that moving around is needed. Both solve the memory problem. You can use either one.</p>
+  <div class="tablebox"><table>
+    <thead><tr><th data-i18n="x64_rt_h0">The memory problem</th><th data-i18n="x64_rt_h1">32-bit patch</th><th data-i18n="x64_rt_h2">64-bit build</th></tr></thead>
+    <tbody>
+      <tr><td data-i18n="x64_rt_r1a">"Failed to allocate memory" crashes with big mods</td><td data-i18n="x64_rt_r1b">Solved: unused data is kept outside the 4 GB</td><td data-i18n="x64_rt_r1c">Solved: there is no 4 GB limit</td></tr>
+      <tr><td data-i18n="x64_rt_r2a">Memory piling up over many matches</td><td data-i18n="x64_rt_r2b">Solved: leftovers are freed</td><td data-i18n="x64_rt_r2c">Solved: no ceiling to run into</td></tr>
+      <tr><td data-i18n="x64_rt_r3a">Mods it can play</td><td data-i18n="x64_rt_r3b">Every mod we know of</td><td data-i18n="x64_rt_r3c">The same mods</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="speed">
+  <div class="eyebrow" data-i18n="x64_ey_speed">Speed</div>
+  <h2 data-i18n="x64_speed_h">Speed and turbo mode</h2>
+  <p data-i18n="x64_speed_p1">64-bit alone does not make big battles faster. They are slow because of the battle simulation, the work every soldier does to find enemies, cover and targets, and 64-bit gives more memory, not less of that work.</p>
+  <p data-i18n="x64_speed_p4">The <a href="#what">64-bit build</a> has the same exact speed fixes as the <a href="index.html">32-bit patch</a>: the slowest parts of the simulation were rewritten to give the same results with less work. With the 32-bit patch they need about 1.5 to 1.7 times less simulation time than the unmodified game in a 300-vs-300 soldier test battle, and less in smaller battles.</p>
+  <h3 data-i18n="x64_speed_h3">The real speed-up: turbo mode (Style v1)</h3>
+  <p data-i18n="x64_speed_p5">To make big battles much faster, the simulation itself has to do less work. That is what <b>turbo mode (Style v1)</b> does. It redesigns how soldiers sense, aim and plan, so that the work grows with the size of the battle instead of exploding with it. The fights look and play like the normal game. In our test battles the turbo mode of the <a href="index.html#style">32-bit patch</a> needed about 5.6 to 9.9 times less simulation time than the unmodified game, more the bigger the battle.</p>
+  <p data-i18n="x64_speed_p6">Turbo mode 1.0.0 is in the <a href="#what">64-bit build</a> too, and it runs the same way as in the 32-bit patch: we played recorded real turbo multiplayer matches (Iwo Jima, Kansas, Grand Suburb, Okinawa with the RobZ Realism Mod, and Abbad Big with the Cold War mod) on the 64-bit build, and it played them just like the PC that recorded them. Its turbo speed is the same as the 32-bit turbo, within a few percent. Turbo is only used in multiplayer when every player in the match has it (see "Playing with others").</p>
+  <div class="card">
+    <h3 data-i18n="speed_h">Work per step</h3>
+    <p class="sub" data-i18n="speed_sub">Million CPU cycles per step. Lower is faster.</p>
+    <div class="legend" id="lgSpeed"></div>
+    <div id="chSpeed"></div>
+    <p class="note" data-i18n="x64_sp_note">The same chart as on the page "How it works", measured with the 32-bit patch. The 64-bit build's turbo mode runs at the same speed, within a few percent.</p>
+  </div>
+</section>
+
+<section id="install">
+  <div class="eyebrow" data-i18n="x64_ey_inst">Install</div>
+  <h2 data-i18n="x64_inst_h">Install and uninstall</h2>
+  <p data-i18n="x64_inst_p1">You get the <a href="#what">64-bit build</a> only through the launcher (<code>MoWAS2-Launcher.exe</code>). It is not on GitHub and there is no separate download. You do not reinstall the game. In the launcher, the <b>Game to start</b> box has:</p>
+  <ul>
+    <li data-i18n="x64_inst_1">two choices, <b>32-bit game with the fix</b> and <b>64-bit build</b>, each with its version;</li>
+    <li data-i18n="x64_inst_2">the button <b>Install 64-bit</b> next to them. Installing selects the 64-bit build;</li>
+    <li data-i18n="x64_inst_3">the big <b>Play</b> button below says which game it starts: <b>Play (32-bit)</b> or <b>Play (64-bit)</b>.</li>
+  </ul>
+  <p data-i18n="x64_inst_p2"><b>Install 64-bit</b> downloads the 64-bit build, checks it against the signed update list, and places it in the game folder next to <code>mowas_2.exe</code>. <b>Uninstall 64-bit</b> removes it again. The <a href="index.html">32-bit patch</a> is not touched.</p>
+  <p data-i18n="x64_inst_p3">Both can stay installed. Pick one in <b>Game to start</b> to switch between them. Always start the game with the launcher.</p>
+  <p data-i18n="x64_inst_own"><b>You need the original game.</b> The 64-bit build only starts when it sits in the game's Steam folder next to the Steam <code>mowas_2.exe</code> and the game's files, Steam is running, the game's Steam file is Valve's original, and your Steam account owns <a href="https://store.steampowered.com/app/244450/"><em>Men of War: Assault Squad 2</em></a> and has it installed. Otherwise it shows a message, for example "Start Steam first" or "This Steam account does not own Men of War: Assault Squad 2 (or it is not installed).", and closes. The launcher installs it only into a Steam installation of the game.</p>
+  <p data-i18n="x64_inst_doc">More details: <a href="docs.html#x64">Documentation: 64-bit build</a>.</p>
+</section>
+
+<section id="diff">
+  <div class="eyebrow" data-i18n="x64_ey_diff">Compared with the patch</div>
+  <h2 data-i18n="x64_diff_h">How it differs from the 32-bit patch</h2>
+  <div class="tablebox"><table>
+    <thead><tr><th data-i18n="x64_t_what">Topic</th><th data-i18n="x64_t_32">32-bit patch</th><th data-i18n="x64_t_64">64-bit build</th></tr></thead>
+    <tbody>
+      <tr><td data-i18n="x64_t_r1a">What it is</td><td data-i18n="x64_t_r1b">A DLL that changes the original 32-bit game while it runs.</td><td data-i18n="x64_t_r1c">A new game program.</td></tr>
+      <tr><td data-i18n="x64_t_r2a">Memory limit</td><td data-i18n="x64_t_r2b">A hard limit of 4 GB of address space.</td><td data-i18n="x64_t_r2c">No 4 GB limit at all.</td></tr>
+      <tr><td data-i18n="x64_t_r3a">Memory work</td><td data-i18n="x64_t_r3b">Most of the work moves unused data out of those 4 GB and frees leftovers, so the game fits.</td><td data-i18n="x64_t_r3c">The moving-data-around tricks are not needed.</td></tr>
+      <tr><td data-i18n="x64_t_r4a">Game files and mods</td><td data-i18n="x64_t_r4b">Your normal game files and mods.</td><td data-i18n="x64_t_r4c">The same game files and the same mods.</td></tr>
+      <tr><td data-i18n="x64_t_r5a">Speed fixes and crash guards</td><td data-i18n="x64_t_r5b">Included in the patch.</td><td data-i18n="x64_t_r5c">Carried over in the source code.</td></tr>
+      <tr><td data-i18n="x64_t_r6a">Speed in big battles</td><td data-i18n="x64_t_r6b">Exact speed fixes, plus turbo mode 1.0.0 in multiplayer when every player has it.</td><td data-i18n="x64_t_r6c">The same: exact speed fixes and turbo mode 1.0.0.</td></tr>
+      <tr><td data-i18n="x64_t_r8a">Where you get it</td><td data-i18n="x64_t_r8b">On GitHub (releases); the launcher installs and updates it.</td><td data-i18n="x64_t_r8c">Only through the launcher.</td></tr>
+      <tr><td data-i18n="x64_t_r9a">Which copy of the game</td><td data-i18n="x64_t_r9b">Your normal game.</td><td data-i18n="x64_t_r9c">Only a Steam installation, with a Steam account that owns the game.</td></tr>
+    </tbody>
+  </table></div>
+  <p data-i18n="x64_diff_p">The <a href="index.html">32-bit patch</a> is not going away: it stays and is still maintained (see the questions at the bottom).</p>
+</section>
+
+<section id="mp">
+  <div class="eyebrow" data-i18n="x64_ey_mp">Multiplayer</div>
+  <h2 data-i18n="x64_mp_h">Playing with others</h2>
+  <p data-i18n="x64_mp_p1">The <a href="#what">64-bit build</a> is compatible with unpatched versions of the game: players with the 64-bit build or the <a href="index.html">32-bit patch</a> can play multiplayer together with players who run the normal, unpatched game. Such a match plays in vanilla compatibility mode. Real Steam matches with 64-bit and 32-bit players together have been played without out-of-sync errors.</p>
+  <h3 data-i18n="x64_mp_h3c">Turbo mode</h3>
+  <p data-i18n="x64_mp_p4">Turbo mode is on when every player in the match has a version with it: the <a href="index.html">32-bit patch</a> 1.0.7-rev2 or the 64-bit build 1.0.0. They play turbo together, whoever hosts. Otherwise the match plays in vanilla compatibility mode, automatically.</p>
+  <ul>
+    <li data-i18n="x64_mp_li4">A player still on 1.0.7-rev1 needs the update, or the match may play in vanilla compatibility mode. The launcher updates automatically.</li>
+    <li data-i18n="x64_mp_li5">Stay in the lobby for about 15 seconds before the host starts the match.</li>
+    <li data-i18n="x64_mp_li6">When the match is on screen, a chat line tells you the mode, for example "64-bit build: everyone in this match runs turbo mode 1.0.0 - turbo mode is on." (32-bit players see "Memory Optimizer Patch: ..."). Otherwise it says that the match is running in vanilla compatibility mode.</li>
+    <li data-i18n="x64_mp_li7">Single player in the 64-bit build plays vanilla (no turbo).</li>
+  </ul>
+</section>
+
+<section id="mods">
+  <div class="eyebrow" data-i18n="x64_ey_mods">Mods</div>
+  <h2 data-i18n="x64_mods_h">Mods</h2>
+  <p data-i18n="x64_mods_p1">The <a href="#what">64-bit build</a> works with the same mods as the 32-bit game.</p>
+</section>
+
+<section id="status">
+  <div class="eyebrow" data-i18n="x64_ey_status">What is included</div>
+  <h2 data-i18n="x64_status_h">What's included</h2>
+  <ul>
+    <li data-i18n="x64_s1">Compatible with the normal, unpatched game in multiplayer (vanilla compatibility mode).</li>
+    <li data-i18n="x64_s2">No 4 GB memory limit.</li>
+    <li data-i18n="x64_s3">The same game files and the same mods.</li>
+    <li data-i18n="x64_s4">The speed fixes and crash guards of the <a href="index.html">32-bit patch</a>.</li>
+    <li data-i18n="x64_s6">Turbo mode 1.0.0 (Style v1), the same as in the 32-bit patch, in multiplayer when every player has it.</li>
+    <li data-i18n="x64_s7">Installed and updated by the launcher, and it checks that you own the game on Steam.</li>
+  </ul>
+</section>
+
+<section id="faq">
+  <div class="eyebrow" data-i18n="x64_ey_faq">Questions</div>
+  <h2 data-i18n="x64_faq_h">Questions and answers</h2>
+  <details class="faq"><summary data-i18n="x64_q1">Do I need to reinstall the game?</summary><p data-i18n="x64_a1">No. Use the launcher: <b>Install 64-bit</b> adds the 64-bit build to the game folder, and the <b>Game to start</b> box chooses which game <b>Play</b> starts. See "Install and uninstall".</p></details>
+  <details class="faq"><summary data-i18n="x64_q8">Where can I download it?</summary><p data-i18n="x64_a8">Only in the launcher: click <b>Install 64-bit</b> in its <b>Game to start</b> box. The 64-bit build is not on GitHub and there is no separate download.</p></details>
+  <details class="faq"><summary data-i18n="x64_q5">Can I run it without the original game?</summary><p data-i18n="x64_a5">No. The 64-bit build only runs together with <a href="https://store.steampowered.com/app/244450/">your own Steam copy</a> of the game: in the game's Steam folder next to <code>mowas_2.exe</code>, with Steam running and a Steam account that owns the game and has it installed.</p></details>
+  <details class="faq"><summary data-i18n="x64_q6">Is the 64-bit build faster?</summary><p data-i18n="x64_a6">64-bit alone is not. What makes big battles much faster is turbo mode (Style v1), which the 64-bit build has just like the <a href="index.html#style">32-bit patch</a>. It is used in multiplayer when every player in the match has it. See "Speed and turbo mode".</p></details>
+  <details class="faq"><summary data-i18n="x64_q7">Which one should I use?</summary><p data-i18n="x64_a7">Both fix the memory crashes, and both have turbo mode. The <a href="index.html">32-bit patch</a> plays every mod we know of. Use the 64-bit build if you want no memory ceiling at all. You can keep both and switch in the launcher.</p></details>
+  <details class="faq"><summary data-i18n="x64_q2">Does it replace the 32-bit patch?</summary><p data-i18n="x64_a2">No. Both can stay installed and you choose in the launcher. The <a href="index.html">32-bit patch</a> keeps being maintained.</p></details>
+  <details class="faq"><summary data-i18n="x64_q3">Can I play with friends who have the normal game?</summary><p data-i18n="x64_a3">Yes. The 64-bit build is compatible with the normal, unpatched game: you play together in vanilla compatibility mode. Turbo mode is only on when everyone in the match has it. See "Playing with others".</p></details>
+  <details class="faq"><summary data-i18n="x64_q4">Will my saves work?</summary><p data-i18n="x64_a4">Yes, in both directions. The 64-bit build loads single-player saves made by the <a href="index.html">32-bit game</a>, and the 32-bit game loads saves made by the 64-bit build, so you can switch back and forth. A save needs the same mods active as when it was made.</p></details>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footlinks">
+      <a href="index.html" data-i18n="nav_how">How it works</a>
+      <a href="x64.html" data-i18n="nav_x64">64-bit</a>
+      <a href="docs.html" data-i18n="nav_docs">Documentation</a>
+      <a href="https://github.com/GEM-Fixes/MOWAS2-Memory-Fixes" data-i18n="nav_github">GitHub</a>
+    </div>
+    <p class="note" data-i18n="x64_foot">Author: Wyldstyle.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  I18N_apply();
+  const root = document.documentElement, btn = document.getElementById('themeToggle');
+  function cur() { return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
+  try { const t = localStorage.getItem('mo-theme'); if (t) root.dataset.theme = t; } catch (e) {}
+  btn.textContent = cur() === 'dark' ? T('light') : T('dark');
+  btn.addEventListener('click', () => {
+    root.dataset.theme = cur() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem('mo-theme', root.dataset.theme); } catch (e) {}
+    btn.textContent = cur() === 'dark' ? T('light') : T('dark');
+  });
+
+  // "Work per step" chart: the same data and drawing as on index.html (Style v1 section).
+  const NS = 'http://www.w3.org/2000/svg';
+  const fmt = n => n.toLocaleString(window.LOCALE || 'en-US');
+  const fmt1 = n => n.toLocaleString(window.LOCALE || 'en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  function el(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function scale(dmax) {
+    const raw = dmax / 5, p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p;
+    const step = (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p, n = Math.ceil(dmax / step - 1e-9);
+    return { max: n * step, n };
+  }
+  function hbars(id, rows, unit, opt = {}) {
+    const W = Math.max(280, Math.round(document.getElementById(id).clientWidth)) || 520, rowH = 34;
+    const padL = Math.min(opt.padL || 120, Math.round(W * 0.42)), padR = Math.min(90, Math.round(W * 0.18)), H = rows.length * rowH + 22;
+    const sc = scale(Math.max(...rows.map(r => r[1]))), max = sc.max;
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': opt.aria || id });
+    const x = v => padL + (W - padL - padR) * v / max;
+    for (let i = 0; i <= sc.n; i++) {
+      const v = max * i / sc.n, X = x(v);
+      el('line', { x1: X, x2: X, y1: 0, y2: H - 18, stroke: 'var(--grid)' }, svg);
+      el('text', { x: X, y: H - 4, 'text-anchor': 'middle', class: 'ax' }, svg).textContent = fmt(v);
+    }
+    rows.forEach(([label, v, c, note], i) => {
+      const y = i * rowH + 6, h = rowH - 12, w = Math.max(2, x(v) - padL);
+      el('text', { x: padL - 10, y: y + h / 2 + 4, 'text-anchor': 'end', class: 'lbl2' }, svg).textContent = label;
+      el('path', { d: `M${padL},${y} h${w - 4} q4,0 4,4 v${h - 8} q0,4 -4,4 h${-(w - 4)} z`, fill: `var(${c})` }, svg);
+      const t = el('text', { x: padL + w + 6, y: y + h / 2 + 4, class: 'lbl' }, svg);
+      t.textContent = fmt(v) + (unit ? ' ' + unit : '');
+      if (note) el('title', {}, t).textContent = note;
+    });
+    document.getElementById(id).appendChild(svg);
+  }
+  document.getElementById('lgSpeed').innerHTML = [['--s2', 'Base game'], ['--s1', 'Style v1']]
+    .map(([c, n]) => '<span><i style="background:var(' + c + ')"></i>' + T(n) + '</span>').join('');
+  const sp = [['800 soldiers', 2444, 266], ['1,000 soldiers', 4034, 406], ['1,700 + guns, tanks', 7751, 1377]];
+  const spRows = [];
+  sp.forEach(s => { spRows.push([T(s[0]) + ' · ' + T('base game'), s[1], '--s2']); spRows.push([T(s[0]) + ' · Style v1', s[2], '--s1', T('{x}× less work', { x: fmt1(s[1] / s[2]) })]); });
+  hbars('chSpeed', spRows, 'M', { padL: 210, aria: 'Work per step' });
+})();
+</script>
+</body>
+</html>

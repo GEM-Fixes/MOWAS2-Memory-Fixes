@@ -121,16 +121,41 @@ footer { padding: 56px 0 72px; color: var(--text-muted); font-size: 14px; }
 .verbox { border-color: var(--accent); margin-top: 24px; }
 .verbox a { font-weight: 600; }
 @media (max-width: 600px) { .hud { display: none; } }
+.site { background: var(--surface-1); border-bottom: 1px solid var(--line); }
+.site .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding-top: 10px; padding-bottom: 10px; }
+.nav { display: flex; flex-wrap: wrap; gap: 4px 6px; }
+.nav a { font: 500 13px/1 "JetBrains Mono", monospace; padding: 8px 10px; border-radius: 6px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; }
+.nav a:hover { border-color: var(--line); }
+.nav a[aria-current="page"] { background: var(--accent); color: #fff; }
+.site .topbar { position: static; right: auto; top: auto; }
+@media (max-width: 600px) {
+  .site .nav { order: 3; width: 100%; flex-wrap: nowrap; }
+  .site .nav a { flex: 1 1 0; text-align: center; padding: 9px 4px; font-size: 12px; }
+}
+.footlinks { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 14px; }
+.footlinks a { font: 500 13px/1.4 "JetBrains Mono", monospace; color: var(--text-secondary); }
+.pagetoc { padding-top: 18px; padding-bottom: 0; }
+.pagetoc .eyebrow { margin-bottom: 8px; }
+.pagetoc ul { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0; max-width: none; }
+.pagetoc a { display: block; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; text-decoration: none; color: var(--text-secondary); font-size: 14px; background: var(--surface-1); }
+.pagetoc a:hover { border-color: var(--accent); color: var(--text-primary); }
 </style>
 <script src="i18n.js"></script>
 </head>
 <body>
-<div class="topbar">
-  <select id="langSel" aria-label="Language">
-    <option value="en">English</option><option value="ru">Русский</option><option value="es">Español</option><option value="de">Deutsch</option><option value="zh">中文</option>
-  </select>
-  <button class="toggle" id="themeToggle" type="button" aria-label="Switch light / dark theme">theme</button>
-</div>
+<div class="site"><div class="wrap">
+  <nav class="nav" aria-label="Site">
+    <a href="index.html" aria-current="page" data-i18n="nav_how">How it works</a>
+    <a href="x64.html" data-i18n="nav_x64">64-bit</a>
+    <a href="docs.html" data-i18n="nav_docs">Documentation</a>
+  </nav>
+  <div class="topbar">
+    <select id="langSel" aria-label="Language">
+      <option value="en">English</option><option value="ru">Русский</option><option value="es">Español</option><option value="de">Deutsch</option><option value="zh">中文</option>
+    </select>
+    <button class="toggle" id="themeToggle" type="button" aria-label="Switch light / dark theme">theme</button>
+  </div>
+</div></div>
 <div class="tip" id="tip" role="status" aria-live="polite"></div>
 
 <header class="hero">
@@ -153,9 +178,9 @@ footer { padding: 56px 0 72px; color: var(--text-muted); font-size: 14px; }
 
 <main class="wrap">
 
-<div class="card verbox" data-i18n="ver">This page is about <b>version 1.0.7</b> of the patch, which is a pre-release for now.
-  <a href="https://github.com/GEM-Fixes/MOWAS2-Memory-Fixes/releases/tag/nightly">Download the 1.0.7 pre-release</a>
-  (or pick "Pre-release" in the launcher). Most numbers come from test runs of 1.0.7 test versions and earlier versions.</div>
+<div class="card verbox" data-i18n="ver">This page is about <b>version 1.0.7</b> of the <a href="#ceiling">32-bit patch</a>, the stable version since 18 November 2026.
+  <a href="https://github.com/GEM-Fixes/MOWAS2-Memory-Fixes/releases">Download the launcher</a>, unzip it, run <b>MoWAS2-Launcher.exe</b> and press <b>Play</b>.
+  Most numbers come from test runs of 1.0.7 test versions and earlier versions.</div>
 
 <section id="ceiling">
   <div class="eyebrow" data-i18n="part1">Part 1 · Memory</div>
@@ -165,6 +190,7 @@ footer { padding: 56px 0 72px; color: var(--text-muted); font-size: 14px; }
     driver. Big mods like RobZ use most of it.</p>
   <p data-i18n="ceil_p3">When the game asks for more memory and there is no free space left, it crashes with
     <code>Failed to allocate memory (eMemory.cpp, 94)</code>.</p>
+  <p data-i18n="idx_x_64">There is also a <a href="x64.html#what">64-bit build</a> with no 4 GB limit. You get it through the launcher.</p>
   <div class="card">
     <h3 data-i18n="waf_h">What is inside the 4 GB during a RobZ multiplayer match (with the patch)</h3>
     <p class="sub" data-i18n="waf_sub">Each square is 16 MB. There are 256 squares = 4,096 MB.</p>
@@ -184,6 +210,7 @@ footer { padding: 56px 0 72px; color: var(--text-muted); font-size: 14px; }
   <p data-i18n="vault_p2">When some game data has not been used for a while, the patch copies it into the extra
     memory and frees the space it took inside the 4 GB. When the game needs that data again, the patch copies it back
     first.</p>
+  <p data-i18n="idx_x_set">Every feature can be switched off one by one: see <a href="docs.html#settings">Documentation: Settings</a>.</p>
   <div class="card">
     <h3 data-i18n="vt_h">Data kept outside the 4 GB: RobZ and Valour</h3>
     <p class="sub" data-i18n="vt_sub">MB. RobZ: Battle of the Bulge after two restarts. Valour: replay of a real 4v4 match, about 11 minutes in.</p>
@@ -249,8 +276,8 @@ footer { padding: 56px 0 72px; color: var(--text-muted); font-size: 14px; }
   <p data-i18n="style_p2">Style v1 is a new way to make these decisions. Soldiers on the same team and in the same small area share the
     work: what one area can see is worked out once, and every soldier there uses it. The game's own animations,
     weapons, bullets and damage are not changed.</p>
-  <p data-i18n="style_p3">Style v1 is still in development. In multiplayer it is only used when every player in the match has
-    version 1.0.7; otherwise the game plays as normal.</p>
+  <p data-i18n="style_p3">Style v1 is turbo mode 1.0.0. It is in both the <a href="#ceiling">32-bit patch</a> (1.0.7) and the <a href="x64.html#what">64-bit build</a>, and they play it together in one match. It is used in multiplayer when every player in the match has a version with it; otherwise the match plays in vanilla compatibility mode, automatically.</p>
+  <p data-i18n="idx_x_mp">More about multiplayer: <a href="docs.html#mp">Documentation: Multiplayer compatibility</a>.</p>
 
   <div class="card">
     <h3 data-i18n="b3d_h">3D view: sight checks, old way and Style v1</h3>
@@ -304,6 +331,12 @@ footer { padding: 56px 0 72px; color: var(--text-muted); font-size: 14px; }
 
 <footer>
   <div class="wrap">
+    <div class="footlinks">
+      <a href="index.html" data-i18n="nav_how">How it works</a>
+      <a href="x64.html" data-i18n="nav_x64">64-bit</a>
+      <a href="docs.html" data-i18n="nav_docs">Documentation</a>
+      <a href="https://github.com/GEM-Fixes/MOWAS2-Memory-Fixes" data-i18n="nav_github">GitHub</a>
+    </div>
     <p class="note" data-i18n="foot">Most numbers were measured on our test computer (a virtual machine with 2 CPU cores and 24 GB of memory). Memory
       used by graphics is different on a normal PC.</p>
   </div>
