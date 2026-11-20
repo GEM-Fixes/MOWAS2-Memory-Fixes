@@ -22,7 +22,7 @@ It has expanded far beyond its original goal and all of this has only been possi
 
 **[The 64-bit build](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/x64.html)**: a version of the game with no 4 GB limit, and why 64-bit alone does not make battles faster.
 
-**[Documentation](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/docs.html)**: install, update channels, the launcher, settings, multiplayer, reports and troubleshooting.
+**[Documentation](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/docs.html)**: install, update channels, the launcher, multiplayer, reports and troubleshooting.
 
 ## How to install
 
@@ -113,8 +113,6 @@ You get the 64-bit build **only through the launcher**. It is not on GitHub and 
 Both can stay installed: pick **32-bit game with the fix** or **64-bit build** in **Game to start**. **Uninstall 64-bit** removes the 64-bit build again; the 32-bit patch is not touched.
 
 **You need the original game.** The 64-bit build only starts when it sits in the game's Steam folder next to the Steam `mowas_2.exe` and the game's files, Steam is running, the game's Steam file is Valve's original, and your Steam account owns [Men of War: Assault Squad 2](https://store.steampowered.com/app/244450/) and has it installed. Otherwise it shows a message (for example "Start Steam first: ...") and closes. The launcher installs it only into a Steam installation of the game.
-
-The `memhook.ini` settings of the 32-bit patch do not apply to the 64-bit build.
 
 ## If something goes wrong
 
