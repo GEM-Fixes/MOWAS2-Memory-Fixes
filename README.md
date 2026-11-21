@@ -56,7 +56,7 @@ You do not need to do anything. Click **Play** and you always get the newest ver
 
 Turbo mode (Style v1, turbo mode 1.0.0) makes big battles much faster: in our test battles it needed about 5.6 to 9.9 times less simulation time than the unmodified game, more the bigger the battle. It is in both the [32-bit patch](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/#style) and the [64-bit build](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/x64.html#what), and they play it together in one match.
 
-- Turbo mode is on when every player in the match has a version with it (32-bit 1.0.7-rev2 or the 64-bit build 1.0.0). Otherwise the match plays in vanilla compatibility mode, automatically: players with the patch or the 64-bit build can play together with players who run the normal, unpatched game.
+- Turbo mode is on when every player in the match has the same version of the 32-bit patch (1.0.7-rev3). Otherwise the match plays in vanilla compatibility mode, automatically: players with the patch or the 64-bit build can play together with players who run the normal, unpatched game.
 - Stay in the lobby for about 15 seconds before the host starts.
 - When the match is on screen, a chat line tells you the mode, for example "Memory Optimizer Patch: everyone in this match runs turbo mode 1.0.0 - turbo mode is on."
 
@@ -204,7 +204,7 @@ Windows ещё не знает эту программу. Это нормаль�
 
 Турбо-режим (Style v1, турбо-режим 1.0.0) сильно ускоряет большие бои: в наших тестовых боях симуляции нужно было примерно в 5,6–9,9 раза меньше времени, чем в обычной игре, и тем больше, чем больше бой. Он есть и в [32-битном патче](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/?lang=ru#style), и в [64-битной версии](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/x64.html?lang=ru#what), и они играют в нём вместе в одном матче.
 
-- Турбо-режим включается, когда у каждого игрока в матче версия с ним (32-битная 1.0.7-rev2 или 64-битная версия 1.0.0). Иначе матч автоматически идёт в режиме совместимости с ванильной игрой, и можно играть с теми, у кого патча нет.
+- Турбо-режим включается, когда у каждого игрока в матче одна и та же версия 32-битного патча (1.0.7-rev3). Иначе матч автоматически идёт в режиме совместимости с ванильной игрой, и можно играть с теми, у кого патча нет.
 - Подождите в лобби около 15 секунд, прежде чем хост запустит матч.
 - Когда матч появился на экране, строка в чате сообщает режим, например "Memory Optimizer Patch: everyone in this match runs turbo mode 1.0.0 - turbo mode is on."
 
@@ -309,7 +309,7 @@ No tienes que hacer nada. Haz clic en **Jugar** y siempre tendrás la versión m
 
 El modo turbo (Style v1, modo turbo 1.0.0) hace mucho más rápidas las batallas grandes: en nuestras batallas de prueba la simulación necesitó entre 5,6 y 9,9 veces menos tiempo que en el juego sin modificar, más cuanto mayor es la batalla. Está en el [parche de 32 bits](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/?lang=es#style) y en la [versión de 64 bits](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/x64.html?lang=es#what), y los dos lo juegan juntos en la misma partida.
 
-- El modo turbo se activa cuando todos los jugadores de la partida tienen una versión con él (32 bits 1.0.7-rev2 o la versión de 64 bits 1.0.0). Si no, la partida se juega automáticamente en modo de compatibilidad vanilla, y puedes jugar con quien no tenga el parche.
+- El modo turbo se activa cuando todos los jugadores de la partida tienen la misma versión del parche de 32 bits (1.0.7-rev3). Si no, la partida se juega automáticamente en modo de compatibilidad vanilla, y puedes jugar con quien no tenga el parche.
 - Espera unos 15 segundos en la sala antes de que el anfitrión inicie la partida.
 - Cuando la partida aparece en pantalla, una línea del chat te dice el modo, por ejemplo "Memory Optimizer Patch: everyone in this match runs turbo mode 1.0.0 - turbo mode is on."
 
@@ -414,7 +414,7 @@ Du musst nichts tun. Klicke auf **Spielen** und du bekommst immer die neueste Ve
 
 Der Turbo-Modus (Style v1, Turbo-Modus 1.0.0) macht große Schlachten viel schneller: In unseren Testschlachten brauchte die Simulation etwa 5,6- bis 9,9-mal weniger Zeit als im unveränderten Spiel, umso mehr, je größer die Schlacht. Er steckt sowohl im [32-Bit-Patch](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/?lang=de#style) als auch in der [64-Bit-Version](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/x64.html?lang=de#what), und beide spielen ihn zusammen in einem Match.
 
-- Der Turbo-Modus ist an, wenn jeder Spieler im Match eine Version mit ihm hat (32-Bit 1.0.7-rev2 oder die 64-Bit-Version 1.0.0). Sonst läuft das Match automatisch im Vanilla-Kompatibilitätsmodus, und du kannst weiter mit Leuten ohne Patch spielen.
+- Der Turbo-Modus ist an, wenn jeder Spieler im Match dieselbe Version des 32-Bit-Patches hat (1.0.7-rev3). Sonst läuft das Match automatisch im Vanilla-Kompatibilitätsmodus, und du kannst weiter mit Leuten ohne Patch spielen.
 - Warte etwa 15 Sekunden in der Lobby, bevor der Host das Match startet.
 - Sobald das Match auf dem Bildschirm ist, nennt dir eine Chatzeile den Modus, zum Beispiel "Memory Optimizer Patch: everyone in this match runs turbo mode 1.0.0 - turbo mode is on."
 
@@ -519,7 +519,7 @@ Windows 还不认识这个程序。这是正常的。
 
 加速模式（Style v1，加速模式 1.0.0）让大型战斗快得多：在我们的测试战斗中，模拟所需时间比未修改的游戏少约 5.6 到 9.9 倍，战斗越大差距越大。[32 位补丁](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/?lang=zh#style)和 [64 位版本](https://gem-fixes.github.io/MOWAS2-Memory-Fixes/x64.html?lang=zh#what)都带有它，两者可以在同一场对战中一起使用。
 
-- 当对战中每位玩家的版本都带有加速模式时（32 位 1.0.7-rev2 或 64 位版本 1.0.0），它就会开启。否则对战会自动以原版兼容模式进行，你仍然可以和没有补丁的玩家一起玩。
+- 当对战中每位玩家都使用同一版本的 32 位补丁（1.0.7-rev3）时，加速模式就会开启。否则对战会自动以原版兼容模式进行，你仍然可以和没有补丁的玩家一起玩。
 - 房主开始对战前，请在大厅里等待约 15 秒。
 - 对战画面出现后，聊天栏会有一行文字告诉你当前模式，例如 "Memory Optimizer Patch: everyone in this match runs turbo mode 1.0.0 - turbo mode is on."
 
